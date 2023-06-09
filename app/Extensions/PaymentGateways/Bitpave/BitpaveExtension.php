@@ -9,6 +9,7 @@ use App\Models\PartnerDiscount;
 use App\Models\Payment;
 use App\Models\ShopProduct;
 use App\Models\User;
+use App\Traits\Coupon as CouponTrait;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,11 +23,15 @@ use Illuminate\Support\Facades\Log;
  */
 class BitpaveExtension extends AbstractExtension
 {
+    use CouponTrait;
+
     public static function getConfig(): array
     {
         return [
             "name" => "Bitpave",
-            "RoutesIgnoreCsrf" => [],
+            "RoutesIgnoreCsrf" => [
+                "payment/BitpaveCallback"
+            ],
         ];
     }
     public static function getRedirectUrl(Payment $payment, ShopProduct $shopProduct, string $totalPriceString): string
@@ -71,6 +76,7 @@ class BitpaveExtension extends AbstractExtension
 
     public static function callback(Request $request)
     {
+        Log::error($request->json());
         try {
 
 
