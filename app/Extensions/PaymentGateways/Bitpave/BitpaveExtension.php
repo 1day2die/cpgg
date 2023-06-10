@@ -3,9 +3,9 @@
 namespace App\Extensions\PaymentGateways\Bitpave;
 
 use App\Classes\AbstractExtension;
+use App\Enums\PaymentStatus;
 use App\Events\PaymentEvent;
 use App\Events\UserUpdateCreditsEvent;
-use App\Models\PartnerDiscount;
 use App\Models\Payment;
 use App\Models\ShopProduct;
 use App\Models\User;
@@ -30,7 +30,7 @@ class BitpaveExtension extends AbstractExtension
         return [
             "name" => "Bitpave",
             "RoutesIgnoreCsrf" => [
-                "payment/BitpaveCallback"
+                "extensions/payment/BitpaveCallback"
             ],
         ];
     }
@@ -87,9 +87,8 @@ class BitpaveExtension extends AbstractExtension
                 $data = json_decode($request->input('custom_data'));
 
                 $payment = Payment::findOrFail($data->payment_id);
-                $payment->status->update([
-                    'status' => "paid",
-                ]);
+                $payment->status = PaymentStatus::PAID;
+                $payment->save();
 
                 $shopProduct = ShopProduct::findOrFail($payment->shop_item_product_id);
                 event(new PaymentEvent($payment, $payment, $shopProduct));
