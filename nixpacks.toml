@@ -1,3 +1,5 @@
+[phase.name]
+phpRedis = "php82Extensions.redis"
 
 [phases.setup]
 nixPkgs = ["...", "python311Packages.supervisor"]
