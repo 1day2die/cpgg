@@ -4,60 +4,43 @@ networks:
   laravel:
 
 services:
-  nginx:
+  app:
     build:
-      dockerfile: DockerfileNGINX
-    container_name: ctrlpanel_nginx
-    ports:
-      - 80:81
-    volumes:
-      - "../:/var/www/html"
+      context: .
+      dockerfile: Dockerfile
     depends_on:
-      - php
       - mysql
     networks:
       - laravel
 
-  mysql:
-    image: mysql
-    container_name: ctrlpanel_mysql
-    restart: unless-stopped
-    tty: true
-    environment:
-      MYSQL_DATABASE: ctrlpanel
-      MYSQL_USER: ctrlpanel
-      MYSQL_PASSWORD: root
-      MYSQL_ROOT_PASSWORD: root
+    nginx:
+    image: nginx:latest
+    ports:
+      - "3000:80"
     volumes:
-      - "mysql:/var/lib/mysql:delegated"
+      - ./nginx:/etc/nginx/conf.d
+      - .:/var/www/html
+    depends_on:
+      - app
     networks:
       - laravel
+
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+    networks:
+      - laravel
+
   redis:
     image: redis:alpine
     networks:
       - laravel
 
-  php:
-    build:
-      dockerfile: DockerfilePHP
-    container_name: ctrlpanel_php
-    volumes:
-      - "../:/var/www/html"
-    networks:
-      - laravel
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: ctrlpanel_phpmyadmin
-    depends_on:
-      - mysql
-    environment:
-      - PMA_HOST=ctrlpanel_mysql
-      - PMA_USER=root
-      - PMA_PASSWORD=root
-      - PMA_ARBITRARY=1
-    networks:
-      - laravel
-
-volumes:
-  mysql:
+networks:
+  laravel:
+    driver: bridge
