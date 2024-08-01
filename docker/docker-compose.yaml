@@ -46,20 +46,5 @@ services:
     networks:
       - laravel
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: ctrlpanel_phpmyadmin
-    depends_on:
-      - mysql
-    ports:
-      - '81:80'
-    environment:
-      - PMA_HOST=ctrlpanel_mysql
-      - PMA_USER=root
-      - PMA_PASSWORD=root
-      - PMA_ARBITRARY=1
-    networks:
-      - laravel
-
 volumes:
   mysql:
