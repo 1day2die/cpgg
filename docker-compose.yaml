@@ -6,7 +6,7 @@ networks:
 services:
   nginx:
     build:
-      context: /
+      context: ../
       dockerfile: docker/nginx/Dockerfile
     container_name: ctrlpanel_nginx
     ports:
@@ -42,7 +42,7 @@ services:
 
   php:
     build:
-      context: /
+      context: ../
       dockerfile: docker/php/Dockerfile
     container_name: ctrlpanel_php
     volumes:
