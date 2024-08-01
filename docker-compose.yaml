@@ -6,8 +6,7 @@ networks:
 services:
   nginx:
     build:
-      context: ../
-      dockerfile: docker/nginx/Dockerfile
+      dockerfile: DockerfileNGINX
     container_name: ctrlpanel_nginx
     ports:
       - 80:80
@@ -42,8 +41,7 @@ services:
 
   php:
     build:
-      context: ../
-      dockerfile: docker/php/Dockerfile
+      dockerfile: DockerfilePHP
     container_name: ctrlpanel_php
     volumes:
       - "../:/var/www/html"
