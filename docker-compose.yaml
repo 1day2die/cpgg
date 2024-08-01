@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - mysql
+    networks:
+      - laravel
+
+#  nginx:
+#    image: nginx:latest
+#    ports:
+#      - "3000:80"
+#    volumes:
+#      - ./nginx:/etc/nginx/conf.d
+#      - .:/var/www/html
+#    depends_on:
+#      - app
+#    networks:
+#      - laravel
+
+  mysql:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
+    networks:
+      - laravel
+
+  redis:
+    image: redis:alpine
+    networks:
+      - laravel
+
+networks:
+  laravel:
+    driver: bridge
