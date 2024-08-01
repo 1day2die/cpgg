@@ -6,7 +6,7 @@ networks:
 services:
   nginx:
     build:
-      context: ../
+      context: .
       dockerfile: docker/nginx/Dockerfile
     container_name: ctrlpanel_nginx
     ports:
@@ -43,6 +43,21 @@ services:
     container_name: ctrlpanel_php
     volumes:
       - "../:/var/www/html"
+    networks:
+      - laravel
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: ctrlpanel_phpmyadmin
+    depends_on:
+      - mysql
+    ports:
+      - '81:80'
+    environment:
+      - PMA_HOST=ctrlpanel_mysql
+      - PMA_USER=root
+      - PMA_PASSWORD=root
+      - PMA_ARBITRARY=1
     networks:
       - laravel
 
