@@ -1,7 +1,4 @@
-version: '3'
-
-networks:
-  laravel:
+version: '3.8'
 
 services:
   app:
@@ -13,7 +10,7 @@ services:
     networks:
       - laravel
 
-    nginx:
+  nginx:
     image: nginx:latest
     ports:
       - "3000:80"
