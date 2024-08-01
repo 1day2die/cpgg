@@ -35,6 +35,10 @@ services:
       - "mysql:/var/lib/mysql:delegated"
     networks:
       - laravel
+  redis:
+    image: redis:alpine
+    networks:
+      - laravel
 
   php:
     build:
