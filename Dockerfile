@@ -41,7 +41,7 @@ RUN chown -R www-data:www-data /var/www/html
 RUN composer install --no-interaction --no-dev
 
 # Expose the port Nginx is listening on
-EXPOSE 3000
+EXPOSE 8000
 
 # Start Nginx and PHP-FPM
 CMD ["sh", "-c", "php-fpm8.2 -D && nginx -g 'daemon off;'"]
