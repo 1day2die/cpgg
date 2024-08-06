@@ -50,7 +50,5 @@ USER root
 # Copy the Nginx configuration file
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 8000 and start php-fpm server
-EXPOSE 8000
 
 CMD service nginx start && php-fpm
