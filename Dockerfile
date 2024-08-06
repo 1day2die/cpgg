@@ -48,7 +48,7 @@ RUN composer install --no-interaction --no-dev --optimize-autoloader
 USER root
 
 # Copy the Nginx configuration file
-COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY ./docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 
 CMD service nginx start && php-fpm
