@@ -50,5 +50,7 @@ USER root
 # Copy the Nginx configuration file
 COPY ./docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 
+EXPOSE 8000
+
 
 CMD service nginx start && php-fpm
