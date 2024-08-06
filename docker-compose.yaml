@@ -1,43 +1,40 @@
-
 version: '3.8'
 
 services:
   app:
+    container_name: app
     build:
       context: ./
       dockerfile: Dockerfile
     depends_on:
       - mysql
     networks:
-      - ctrlpanel
-    volumes:
-      - app:/var/www/html
+      - laravel
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   mysql:
+    container_name: mysql
     image: mysql:8.0
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ctrlpanel
-      MYSQL_USER: ctrlpanel
-      MYSQL_PASSWORD: ctrlpanel
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel
     networks:
-      - ctrlpanel
-    volumes:
-      - mysql:/var/lib/mysql
+      - laravel
 
   redis:
+    container_name: redis
     image: redis:alpine
     networks:
-      - ctrlpanel
-    volumes:
-      - redis:/data
+      - laravel
 
 networks:
-  ctrlpanel:
+  laravel:
     driver: bridge
-
-volumes:
-    app:
-    mysql:
-    redis:
