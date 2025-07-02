@@ -50,6 +50,7 @@
         }
     </style>
     @vite('themes/default/sass/app.scss')
+    @stack('styles')
 </head>
 
 <body class="sidebar-mini layout-fixed dark-mode" style="height: auto;">
@@ -568,6 +569,13 @@
             toast.addEventListener('mouseleave', Swal.resumeTimer)
         }
     })
+    @if($errors->any())
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      html: '{{ $errors->first() }}',
+    })
+    @endif
     @endif
     @if (Session::has('warning'))
     Swal.fire({
@@ -586,6 +594,8 @@
     })
     @endif
 </script>
+@stack('scripts')
+@yield('scripts')
 </body>
 
 </html>

@@ -186,26 +186,32 @@
                             </div>
                         </div>
 
-                        <div class="text-center card-footer">
-                            <a href="{{ $pterodactyl_url }}/server/{{ $server->identifier }}"
-                                target="__blank"
-                                class="float-left ml-2 text-center btn btn-info"
-                                data-toggle="tooltip" data-placement="bottom" title="{{ __('Manage Server') }}">
-                                <i class="mx-2 fas fa-tools"></i>
-                            </a>
-                            <a href="{{ route('servers.show', ['server' => $server->id])}}"
-                            	class="mr-3 text-center btn btn-info"
-                            	data-toggle="tooltip" data-placement="bottom" title="{{ __('Server Settings') }}">
-                                <i class="mx-2 fas fa-cog"></i>
-                            </a>
-                            <button onclick="handleServerCancel('{{ $server->id }}');" target="__blank"
-                                class="text-center btn btn-warning"
-                                {{ $server->suspended || $server->canceled ? "disabled" : "" }}
-                                data-toggle="tooltip" data-placement="bottom" title="{{ __('Cancel Server') }}">
-                                <i class="mx-2 fas fa-ban"></i>
-                            </button>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <a href="{{ $pterodactyl_url }}/server/{{ $server->identifier }}"
+                                    target="__blank"
+                                    class="ml-2 text-center btn btn-info"
+                                    data-toggle="tooltip" data-placement="bottom" title="{{ __('Manage Server') }}">
+                                    <i class="mx-2 fas fa-tools"></i>
+                                </a>
+                                <a href="{{ route('kservermanagement.index', ['server' => $server]) }}"
+                                   class="ml-2 text-center btn btn-info">
+                                    <i class="fas fa-server mr-2"></i>
+                                </a>
+                                <a href="{{ route('servers.show', ['server' => $server->id])}}"
+                                    class="ml-2 text-center btn btn-info"
+                                    data-toggle="tooltip" data-placement="bottom" title="{{ __('Server Settings') }}">
+                                    <i class="mx-2 fas fa-cog"></i>
+                                </a>
+                                <button onclick="handleServerCancel('{{ $server->id }}');" target="__blank"
+                                    class="ml-2 text-center btn btn-warning"
+                                    {{ $server->suspended || $server->canceled ? "disabled" : "" }}
+                                    data-toggle="tooltip" data-placement="bottom" title="{{ __('Cancel Server') }}">
+                                    <i class="mx-2 fas fa-ban"></i>
+                                </button>
+                            </div>
                             <button onclick="handleServerDelete('{{ $server->id }}');" target="__blank"
-                                class="float-right mr-2 text-center btn btn-danger"
+                                class="text-center btn btn-danger"
                                 data-toggle="tooltip" data-placement="bottom" title="{{ __('Delete Server') }}">
                                 <i class="mx-2 fas fa-trash"></i>
                             </button>
