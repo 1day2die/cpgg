@@ -223,7 +223,6 @@
                     @endif
 
                     @canany(array_merge(
-                        PermissionGroups::TICKET_PERMISSIONS,
                         PermissionGroups::OVERVIEW_PERMISSIONS,
                         PermissionGroups::TICKET_ADMIN_PERMISSIONS,
                         PermissionGroups::TICKET_BLACKLIST_PERMISSIONS,
