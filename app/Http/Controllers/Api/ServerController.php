@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
 use App\Models\Server;
-use Exception;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
+use App\Http\Resources\ServerResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use Exception;
 
-class ServerController extends Controller
+class ServerController extends BaseApiController
 {
     public const ALLOWED_INCLUDES = ['product', 'user'];
 
@@ -22,76 +19,92 @@ class ServerController extends Controller
      * Display a listing of the resource.
      *
      * @param  Request  $request
-     * @return LengthAwarePaginator
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request)
     {
-        $query = QueryBuilder::for(Server::class)
+        $servers = QueryBuilder::for(Server::class)
             ->allowedIncludes(self::ALLOWED_INCLUDES)
-            ->allowedFilters(self::ALLOWED_FILTERS);
+            ->allowedFilters(self::ALLOWED_FILTERS)
+            ->paginate($request->input('per_page') ?? 50);
 
-        return $query->paginate($request->input('per_page') ?? 50);
+        return ServerResource::collection($servers);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  Server  $server
-     * @return Server|Collection|Model
+     * @param  string  $serverId
+     * @return ServerResource
      */
-    public function show(Server $server)
+    public function show(string $serverId)
     {
-        $query = QueryBuilder::for(Server::class)
-            ->where('id', '=', $server->id)
-            ->allowedIncludes(self::ALLOWED_INCLUDES);
+        $server = QueryBuilder::for(Server::class)
+            ->where('id', $serverId)
+            ->allowedIncludes(self::ALLOWED_INCLUDES)
+            ->firstOrFail();
 
-        return $query->firstOrFail();
+        return ServerResource::make($server);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Server  $server
-     * @return Server
+     * @param  string  $serverId
+     * @return ServerResource
      */
-    public function destroy(Server $server)
+    public function destroy(string $serverId)
     {
+        $server = QueryBuilder::for(Server::class)
+            ->where('id', $serverId)
+            ->firstOrFail();
+
         $server->delete();
 
-        return $server;
+        return ServerResource::make($server);
     }
 
     /**
      * suspend server
      *
-     * @param  Server  $server
-     * @return Server|JsonResponse
+     * @param  string  $serverId
+     * @return ServerResource|JsonResponse
      */
-    public function suspend(Server $server)
+    public function suspend(string $serverId)
     {
+        $server = QueryBuilder::for(Server::class)
+            ->where('id', $serverId)
+            ->allowedIncludes(self::ALLOWED_INCLUDES)
+            ->firstOrFail();
+
         try {
             $server->suspend();
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
 
-        return $server->load('product');
+        return ServerResource::make($server);
     }
 
     /**
      * unsuspend server
      *
-     * @param  Server  $server
-     * @return Server|JsonResponse
+     * @param  string  $serverId
+     * @return ServerResource|JsonResponse
      */
-    public function unSuspend(Server $server)
+    public function unSuspend(string $serverId)
     {
+        $server = QueryBuilder::for(Server::class)
+            ->where('id', $serverId)
+            ->allowedIncludes(self::ALLOWED_INCLUDES)
+            ->firstOrFail();
+
         try {
             $server->unSuspend();
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
 
-        return $server->load('product');
+        return ServerResource::make($server);
     }
 }

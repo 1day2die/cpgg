@@ -6,7 +6,7 @@ use NumberFormatter;
 
 class CurrencyHelper
 {
-    private function convertForDisplay($amount)
+    public function convertForDisplay($amount)
     {
         return $amount / 1000;
     }
@@ -26,7 +26,7 @@ class CurrencyHelper
         return (int)($amount * 1000);
     }
 
-    public function formatToCurrency(int $amount, $currency_code, $locale = null,)
+    public function formatToCurrency(int $amount, $currency_code, $locale = null)
     {
         $locale = $locale ?: str_replace('_', '-', app()->getLocale());
 

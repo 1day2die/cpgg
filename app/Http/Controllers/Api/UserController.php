@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Classes\Pterodactyl;
 use App\Classes\PterodactylClient;
 use App\Events\UserUpdateCreditsEvent;
-use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use App\Models\DiscordUser;
 use App\Models\User;
 use App\Notifications\ReferralNotification;
 use App\Settings\PterodactylSettings;
+use App\Settings\ReferralSettings;
 use App\Settings\UserSettings;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
@@ -27,38 +27,41 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class UserController extends Controller
+class UserController extends BaseApiController
 {
     private $pterodactyl;
 
     public function __construct(PterodactylSettings $ptero_settings)
     {
         $this->pterodactyl = new PterodactylClient($ptero_settings);
-    }
-    const ALLOWED_INCLUDES = ['servers', 'notifications', 'payments', 'vouchers', 'roles', 'discordUser'];
 
+        parent::__construct();
+    }
+
+    const ALLOWED_INCLUDES = ['servers.product', 'notifications', 'payments', 'vouchers.users', 'roles', 'discordUser'];
     const ALLOWED_FILTERS = ['name', 'server_limit', 'email', 'pterodactyl_id', 'suspended'];
 
     /**
      * Display a listing of the resource.
      *
      * @param  Request  $request
-     * @return LengthAwarePaginator
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request)
     {
-        $query = QueryBuilder::for(User::class)
+        $users = QueryBuilder::for(User::class)
             ->allowedIncludes(self::ALLOWED_INCLUDES)
-            ->allowedFilters(self::ALLOWED_FILTERS);
+            ->allowedFilters(self::ALLOWED_FILTERS)
+            ->paginate($request->input('per_page') ?? 50);
 
-        return $query->paginate($request->input('per_page') ?? 50);
+        return UserResource::collection($users);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return User|Builder|Collection|Model
+     * @return UserResource|\Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function show(int $id)
     {
@@ -67,15 +70,16 @@ class UserController extends Controller
             ? $discordUser->user()->getQuery()
             : User::query();
 
-        $query = QueryBuilder::for($userQuery)
+        $user = QueryBuilder::for($userQuery)
             ->with('discordUser')
             ->allowedIncludes(self::ALLOWED_INCLUDES)
             ->where('users.id', '=', $id)
             ->orWhereHas('discordUser', function (Builder $builder) use ($id) {
                 $builder->where('id', '=', $id);
-            });
+            })
+            ->firstOrFail();
 
-        return $query->firstOrFail();
+        return UserResource::make($user);
     }
 
     /**
@@ -83,7 +87,9 @@ class UserController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return User
+     * @return UserResource|Illuminate\Database\Eloquent\ModelNotFoundException
+     * 
+     * @throws ValidationException
      */
     public function update(Request $request, int $id)
     {
@@ -91,9 +97,9 @@ class UserController extends Controller
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
         $request->validate([
-            'name' => 'sometimes|string|min:4|max:30',
-            'email' => 'sometimes|string|email',
-            'credits' => 'sometimes|numeric|min:0|max:1000000',
+            'name' => 'required|string|min:4|max:30',
+            'email' => 'required|string|email',
+            'credits' => 'sometimes|numeric|min:0.01|max:50000',
             'server_limit' => 'sometimes|numeric|min:0|max:1000000',
         ]);
 
@@ -118,9 +124,10 @@ class UserController extends Controller
             $collectedRoles = collect($request->role)->map(fn($val)=>(int)$val);
             $user->syncRoles($collectedRoles);
         }
+
         $user->update($request->except('role'));
 
-        return $user;
+        return UserResource::make($user);
     }
 
     /**
@@ -128,7 +135,7 @@ class UserController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return User
+     * @return UserResource|\Illuminate\Database\Eloquent\ModelNotFoundException
      *
      * @throws ValidationException
      */
@@ -138,30 +145,30 @@ class UserController extends Controller
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
         $request->validate([
-            'credits' => 'sometimes|numeric|min:0|max:1000000',
+            'credits' => 'sometimes|numeric|min:0.01|max:50000',
             'server_limit' => 'sometimes|numeric|min:0|max:1000000',
         ]);
 
         if ($request->credits) {
-            if ($user->credits + $request->credits >= 99999999) {
+            if ($user->credits + $request->credits >= $this->currencyHelper->prepareForDatabase(50000)) {
                 throw ValidationException::withMessages([
-                    'credits' => "You can't add this amount of credits because you would exceed the credit limit",
+                    'credits' => __("You can't add this amount of credits because you would exceed the credit limit"),
                 ]);
             }
             event(new UserUpdateCreditsEvent($user));
-            $user->increment('credits', $request->credits);
+            $user->increment('credits', $this->currencyHelper->prepareForDatabase($request->credits));
         }
 
         if ($request->server_limit) {
             if ($user->server_limit + $request->server_limit >= 2147483647) {
                 throw ValidationException::withMessages([
-                    'server_limit' => 'You cannot add this amount of servers because it would exceed the server limit.',
+                    'server_limit' => __("You cannot add this amount of servers because it would exceed the server limit."),
                 ]);
             }
             $user->increment('server_limit', $request->server_limit);
         }
 
-        return $user;
+        return UserResource::make($user->fresh());
     }
 
     /**
@@ -169,7 +176,7 @@ class UserController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return User
+     * @return UserResource|\Illuminate\Database\Eloquent\ModelNotFoundException
      *
      * @throws ValidationException
      */
@@ -179,29 +186,29 @@ class UserController extends Controller
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
         $request->validate([
-            'credits' => 'sometimes|numeric|min:0|max:1000000',
+            'credits' => 'sometimes|numeric|min:0.01|max:50000',
             'server_limit' => 'sometimes|numeric|min:0|max:1000000',
         ]);
 
         if ($request->credits) {
-            if ($user->credits - $request->credits < 0) {
+            if ($user->credits - $this->currencyHelper->prepareForDatabase($request->credits) < 0) {
                 throw ValidationException::withMessages([
-                    'credits' => "You can't remove this amount of credits because you would exceed the minimum credit limit",
+                    'credits' => __("You can't remove this amount of credits because you would exceed the minimum credit limit"),
                 ]);
             }
-            $user->decrement('credits', $request->credits);
+            $user->decrement('credits', $this->currencyHelper->prepareForDatabase($request->credits));
         }
 
         if ($request->server_limit) {
             if ($user->server_limit - $request->server_limit < 0) {
                 throw ValidationException::withMessages([
-                    'server_limit' => 'You cannot remove this amount of servers because it would exceed the minimum server.',
+                    'server_limit' => __("You cannot remove this amount of servers because it would exceed the minimum server."),
                 ]);
             }
             $user->decrement('server_limit', $request->server_limit);
         }
 
-        return $user;
+        return UserResource::make($user->fresh());
     }
 
     /**
@@ -209,9 +216,7 @@ class UserController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return bool
-     *
-     * @throws ValidationException
+     * @return UserResource|\Illuminate\Http\JsonResponse|\Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function suspend(Request $request, int $id)
     {
@@ -219,13 +224,14 @@ class UserController extends Controller
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
         if ($user->isSuspended()) {
-            throw ValidationException::withMessages([
-                'error' => 'The user is already suspended',
-            ]);
+            return response()->json([
+                'error' => __('The user is already suspended'),
+            ], 400);
         }
+        
         $user->suspend();
 
-        return $user;
+        return UserResource::make($user);
     }
 
     /**
@@ -233,9 +239,7 @@ class UserController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return bool
-     *
-     * @throws ValidationException
+     * @return UserResource|\Illuminate\Http\JsonResponse|\Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function unsuspend(Request $request, int $id)
     {
@@ -243,14 +247,14 @@ class UserController extends Controller
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
         if (! $user->isSuspended()) {
-            throw ValidationException::withMessages([
-                'error' => 'You cannot unsuspend an User who is not suspended.',
-            ]);
+            return response()->json([
+                'error' => __('The user is not suspended'),
+            ], 400);
         }
 
         $user->unSuspend();
 
-        return $user;
+        return UserResource::make($user);
     }
 
     /**
@@ -269,9 +273,13 @@ class UserController extends Controller
     }
 
     /**
+     * @param Request  $request
+     * @param UserSettings $userSettings
+     * @return UserResource
+     * 
      * @throws ValidationException
      */
-    public function store(Request $request, UserSettings $userSettings)
+    public function store(Request $request, UserSettings $userSettings, ReferralSettings $referralSettings)
     {
         $request->validate([
             'name' => ['required', 'string', 'max:30', 'min:4', 'alpha_num', 'unique:users'],
@@ -289,8 +297,8 @@ class UserController extends Controller
         $user = User::create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
-            'credits' => config('SETTINGS::USER:INITIAL_CREDITS', 150),
-            'server_limit' => config('SETTINGS::USER:INITIAL_SERVER_LIMIT', 1),
+            'credits' => $userSettings->initial_credits,
+            'server_limit' => $userSettings->initial_server_limit,
             'password' => Hash::make($request->input('password')),
             'referral_code' => $this->createReferralCode(),
         ]);
@@ -322,8 +330,8 @@ class UserController extends Controller
             $ref_code = $request->input('referral_code');
             $new_user = $user->id;
             if ($ref_user = User::query()->where('referral_code', '=', $ref_code)->first()) {
-                if (config('SETTINGS::REFERRAL:MODE') == 'register' || config('SETTINGS::REFERRAL:MODE') == 'both') {
-                    $ref_user->increment('credits', config('SETTINGS::REFERRAL::REWARD'));
+                if ($referralSettings->mode == 'register' || $referralSettings->mode == 'both') {
+                    $ref_user->increment('credits', $referralSettings->reward);
                     $ref_user->notify(new ReferralNotification($ref_user->id, $new_user));
                 }
                 //INSERT INTO USER_REFERRALS TABLE
@@ -337,14 +345,14 @@ class UserController extends Controller
         }
         $user->sendEmailVerificationNotification();
 
-        return $user;
+        return UserResource::make($user);
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return Application|Response|ResponseFactory
+     * @return UserResource|\Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function destroy(int $id)
     {
@@ -353,6 +361,6 @@ class UserController extends Controller
 
         $user->delete();
 
-        return response($user, 200);
+        return UserResource::make($user);
     }
 }

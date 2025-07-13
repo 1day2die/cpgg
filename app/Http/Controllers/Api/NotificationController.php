@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Resources\NotificationResource;
 use App\Models\DiscordUser;
 use App\Models\User;
 use App\Notifications\DynamicNotification;
@@ -16,21 +16,23 @@ use Illuminate\Validation\ValidationException;
 use Spatie\ValidationRules\Rules\Delimited;
 use Exception;
 
-class NotificationController extends Controller
+class NotificationController extends BaseApiController
 {
     /**
      * Display all notifications of an user.
      *
      * @param  Request  $request
      * @param  int  $userId
-     * @return Response
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index(Request $request, int $userId)
     {
         $discordUser = DiscordUser::find($userId);
         $user = $discordUser ? $discordUser->user : User::findOrFail($userId);
 
-        return $user->notifications()->paginate($request->query('per_page', 50));
+        $notifications = $user->notifications()->paginate($request->query('per_page', 50));
+
+        return NotificationResource::collection($notifications);
     }
 
     /**
@@ -38,20 +40,16 @@ class NotificationController extends Controller
      *
      * @param  int  $userId
      * @param  int  $notificationId
-     * @return JsonResponse
+     * @return NotificationResource
      */
     public function view(int $userId, $notificationId)
     {
         $discordUser = DiscordUser::find($userId);
         $user = $discordUser ? $discordUser->user : User::findOrFail($userId);
 
-        $notification = $user->notifications()->where('id', $notificationId)->get()->first();
+        $notification = $user->notifications()->where('id', $notificationId)->firstOrFail();
 
-        if (! $notification) {
-            return response()->json(['message' => 'Notification not found.'], 404);
-        }
-
-        return $notification;
+        return NotificationResource::make($notification);
     }
 
     /**
@@ -136,21 +134,16 @@ class NotificationController extends Controller
      *
      * @param  int  $userId
      * @param  int  $notificationId
-     * @return JsonResponse
+     * @return NotificationResource
      */
     public function deleteOne(int $userId, $notificationid)
     {
         $discordUser = DiscordUser::find($userId);
         $user = $discordUser ? $discordUser->user : User::findOrFail($userId);
 
-        $notification = $user->notifications()->where('id', $notificationid)->get()->first();
-
-        if (! $notification) {
-            return response()->json(['message' => 'Notification not found.'], 404);
-        }
-
+        $notification = $user->notifications()->where('id', $notificationid)->firstOrFail();
         $notification->delete();
 
-        return response()->json($notification);
+        return NotificationResource::make($notification);
     }
 }

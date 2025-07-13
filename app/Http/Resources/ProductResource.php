@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Request;
+
+class ProductResource extends BaseJsonResource
+{
+    /**
+     * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(Request $request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'price' => $this->currencyHelper->convertForDisplay($this->price),
+            'memory' => $this->memory,
+            'cpu' => $this->cpu,
+            'swap' => $this->swap,
+            'disk' => $this->disk,
+            'io' => $this->io,
+            'databases' => $this->databases,
+            'backups' => $this->backups,
+            'serverlimit' => $this->serverlimit,
+            'allocations' => $this->allocations,
+            'oom_killer' => $this->oom_killer,
+            'default_billing_priority' => $this->default_billing_priority,
+            'disabled' => $this->disabled,
+            'minimum_credits' => $this->minimum_credits ? $this->currencyHelper->convertForDisplay($this->minimum_credits) : null,
+            'billing_period' => $this->billing_period,
+            'created_at' => $this->created_at->toDateTimeString(),
+            'updated_at' => $this->updated_at->toDateTimeString(),
+        ];
+    }
+}

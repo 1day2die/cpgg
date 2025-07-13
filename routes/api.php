@@ -29,7 +29,6 @@ Route::middleware('api.token')->group(function () {
     Route::patch('/servers/{server}/unsuspend', [ServerController::class, 'unSuspend']);
     Route::resource('servers', ServerController::class)->except(['store', 'create', 'edit', 'update']);
 
-    //    Route::get('/vouchers/{voucher}/users' , [VoucherController::class , 'users']);
     Route::resource('vouchers', VoucherController::class)->except('create', 'edit');
 
     Route::resource('roles', RoleController::class);
