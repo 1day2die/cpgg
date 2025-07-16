@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Request;
 
-class PermissionResource extends BaseJsonResource
+class PermissionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Request;
 
-class NotificationResource extends BaseJsonResource
+class NotificationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

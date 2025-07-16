@@ -2,10 +2,20 @@
 
 namespace App\Http\Resources;
 
+use App\Helpers\CurrencyHelper;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends BaseJsonResource
+class UserResource extends JsonResource
 {
+    protected CurrencyHelper $currencyHelper;
+
+    public function __construct(mixed $resource)
+    {
+        parent::__construct($resource);
+        $this->currencyHelper = app(CurrencyHelper::class);
+    }
+
     /**
      * Transform the resource into an array.
      *
