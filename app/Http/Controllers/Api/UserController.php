@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Classes\PterodactylClient;
 use App\Events\UserUpdateCreditsEvent;
+use App\Helpers\CurrencyHelper;
 use App\Http\Resources\UserResource;
 use App\Models\DiscordUser;
 use App\Models\User;
@@ -11,6 +12,7 @@ use App\Notifications\ReferralNotification;
 use App\Settings\PterodactylSettings;
 use App\Settings\ReferralSettings;
 use App\Settings\UserSettings;
+use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -21,15 +23,15 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class UserController extends BaseApiController
+class UserController extends Controller
 {
     private $pterodactyl;
+    private $currencyHelper;
 
-    public function __construct(PterodactylSettings $ptero_settings)
+    public function __construct(PterodactylSettings $ptero_settings, CurrencyHelper $currencyHelper)
     {
         $this->pterodactyl = new PterodactylClient($ptero_settings);
-
-        parent::__construct();
+        $this->currencyHelper = $currencyHelper;
     }
 
     const ALLOWED_INCLUDES = ['servers.product', 'notifications', 'payments', 'vouchers.users', 'roles', 'discordUser'];
@@ -81,7 +83,7 @@ class UserController extends BaseApiController
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return UserResource|Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return UserResource|Illuminate\Database\Eloquent\ModelNotFoundExpcetion
      * 
      * @throws ValidationException
      */

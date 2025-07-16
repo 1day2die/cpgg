@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Voucher;
 use App\Http\Resources\VoucherResource;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class VoucherController extends BaseApiController
+class VoucherController extends Controller
 {
     const ALLOWED_INCLUDES = ['users'];
-
     const ALLOWED_FILTERS = ['code', 'memo', 'credits', 'uses'];
 
     /**

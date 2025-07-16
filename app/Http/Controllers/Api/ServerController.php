@@ -7,12 +7,12 @@ use App\Http\Resources\ServerResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use App\Http\Controllers\Controller;
 use Exception;
 
-class ServerController extends BaseApiController
+class ServerController extends Controller
 {
     public const ALLOWED_INCLUDES = ['product', 'user'];
-
     public const ALLOWED_FILTERS = ['name', 'suspended', 'identifier', 'pterodactyl_id', 'user_id', 'product_id'];
 
     /**

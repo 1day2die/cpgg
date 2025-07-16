@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Http\Resources\RoleResource;
 use App\Models\User;
 use App\Models\Role;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class RoleController extends BaseApiController
+class RoleController extends Controller
 {
     const ALLOWED_INCLUDES = ['permissions', 'users'];
-
     const ALLOWED_FILTERS = ['name'];
 
     /**

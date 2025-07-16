@@ -6,6 +6,7 @@ use App\Http\Resources\NotificationResource;
 use App\Models\DiscordUser;
 use App\Models\User;
 use App\Notifications\DynamicNotification;
+use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ use Illuminate\Validation\ValidationException;
 use Spatie\ValidationRules\Rules\Delimited;
 use Exception;
 
-class NotificationController extends BaseApiController
+class NotificationController extends Controller
 {
     /**
      * Display all notifications of an user.
