@@ -16,10 +16,10 @@ class ServerController extends Controller
     public const ALLOWED_FILTERS = ['name', 'suspended', 'identifier', 'pterodactyl_id', 'user_id', 'product_id'];
 
     /**
-     * Display a listing of the resource.
+     * Show a list of servers.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return ServerResource
      */
     public function index(Request $request)
     {
@@ -32,12 +32,13 @@ class ServerController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Show the specified server.
      *
+     * @param  Request  $request
      * @param  string  $serverId
      * @return ServerResource
      */
-    public function show(string $serverId)
+    public function show(Request $request, string $serverId)
     {
         $server = QueryBuilder::for(Server::class)
             ->where('id', $serverId)
@@ -48,12 +49,13 @@ class ServerController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified server from the system.
      *
+     * @param  Request  $request
      * @param  string  $serverId
      * @return ServerResource
      */
-    public function destroy(string $serverId)
+    public function destroy(Request $request, string $serverId)
     {
         $server = QueryBuilder::for(Server::class)
             ->where('id', $serverId)
@@ -65,12 +67,13 @@ class ServerController extends Controller
     }
 
     /**
-     * suspend server
+     * Suspend server.
      *
+     * @param  Request  $request
      * @param  string  $serverId
      * @return ServerResource|JsonResponse
      */
-    public function suspend(string $serverId)
+    public function suspend(Request $request, string $serverId)
     {
         $server = QueryBuilder::for(Server::class)
             ->where('id', $serverId)
@@ -87,12 +90,13 @@ class ServerController extends Controller
     }
 
     /**
-     * unsuspend server
+     * Unsuspend server.
      *
+     * @param  Request  $request
      * @param  string  $serverId
      * @return ServerResource|JsonResponse
      */
-    public function unSuspend(string $serverId)
+    public function unSuspend(Request $request, string $serverId)
     {
         $server = QueryBuilder::for(Server::class)
             ->where('id', $serverId)

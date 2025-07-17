@@ -20,11 +20,11 @@ use Exception;
 class NotificationController extends Controller
 {
     /**
-     * Display all notifications of an user.
+     * Show a list of notifications for a user.
      *
      * @param  Request  $request
      * @param  int  $userId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return NotificationResource
      */
     public function index(Request $request, int $userId)
     {
@@ -37,13 +37,14 @@ class NotificationController extends Controller
     }
 
     /**
-     * Display a specific notification
+     * Show a specific notification of a user.
      *
+     * @param  Request  $request
      * @param  int  $userId
      * @param  int  $notificationId
      * @return NotificationResource
      */
-    public function view(int $userId, $notificationId)
+    public function view(Request $request, int $userId, $notificationId)
     {
         $discordUser = DiscordUser::find($userId);
         $user = $discordUser ? $discordUser->user : User::findOrFail($userId);
@@ -117,10 +118,11 @@ class NotificationController extends Controller
     /**
      * Delete all notifications from an user
      *
+     * @param  Request  $request
      * @param  int  $userId
      * @return JsonResponse
      */
-    public function delete(int $userId)
+    public function delete(Request $request, int $userId)
     {
         $discordUser = DiscordUser::find($userId);
         $user = $discordUser ? $discordUser->user : User::findOrFail($userId);
@@ -131,18 +133,19 @@ class NotificationController extends Controller
     }
 
     /**
-     * Delete a specific notification
+     * Delete a specific notification from an user.
      *
+     * @param Request $request
      * @param  int  $userId
      * @param  int  $notificationId
      * @return NotificationResource
      */
-    public function deleteOne(int $userId, $notificationid)
+    public function deleteOne(Request $request, int $userId, $notificationId)
     {
         $discordUser = DiscordUser::find($userId);
         $user = $discordUser ? $discordUser->user : User::findOrFail($userId);
 
-        $notification = $user->notifications()->where('id', $notificationid)->firstOrFail();
+        $notification = $user->notifications()->where('id', $notificationId)->firstOrFail();
         $notification->delete();
 
         return NotificationResource::make($notification);

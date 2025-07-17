@@ -15,9 +15,10 @@ class RoleController extends Controller
     const ALLOWED_FILTERS = ['name'];
 
     /**
-     * Display a listing of the resource.
+     * Show a list of roles.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param Request $request
+     * @return RoleResource
      */
     public function index(Request $request)
     {
@@ -30,7 +31,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a new role in the system.
      *
      * @param  Request  $request
      * @return RoleResource
@@ -64,12 +65,13 @@ class RoleController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Show the specified role.
      *
+     * @param  Request  $request
      * @param  int  $id
      * @return RoleResource
      */
-    public function show(int $id)
+    public function show(Request $request, int $id)
     {
         $role = QueryBuilder::for(Role::class)
             ->where('id', '=', $id)
@@ -80,7 +82,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified role in the system.
      *
      * @param  Request  $request
      * @param  int  $id
@@ -113,10 +115,11 @@ class RoleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param  Request  $request
      * @param  int  $id
      * @return RoleResource|\Illuminate\Http\JsonResponse
      */
-    public function destroy(int $id)
+    public function destroy(Request $request, int $id)
     {
         $role = Role::findOrFail($id);
 

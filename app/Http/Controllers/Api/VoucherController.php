@@ -7,6 +7,7 @@ use App\Http\Resources\VoucherResource;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class VoucherController extends Controller
 {
@@ -14,9 +15,10 @@ class VoucherController extends Controller
     const ALLOWED_FILTERS = ['code', 'memo', 'credits', 'uses'];
 
     /**
-     * Display a listing of the resource.
+     * Show a list of vouchers.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @param Request $request
+     * @return VoucherResource
      */
     public function index(Request $request)
     {
@@ -29,7 +31,7 @@ class VoucherController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a new voucher in the system.
      *
      * @param  Request  $request
      * @return VoucherResource
@@ -50,12 +52,15 @@ class VoucherController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Show the specified voucher.
      *
+     * @param Request $request
      * @param  int  $id
-     * @return VoucherResource|\Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return VoucherResource
+     * 
+     * @throws ModelNotFoundException
      */
-    public function show(int $id)
+    public function show(Request $request, int $id)
     {
         $voucher = QueryBuilder::for(Voucher::class)
             ->where('id', '=', $id)
@@ -66,11 +71,13 @@ class VoucherController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified voucher in the system.
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return VoucherResource|\Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return VoucherResource
+     * 
+     * @throws ModelNotFoundException
      */
     public function update(Request $request, int $id)
     {
@@ -90,12 +97,15 @@ class VoucherController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified voucher from the system.
      *
+     * @param  Request  $request
      * @param  int  $id
-     * @return VoucherResource|\Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return VoucherResource
+     * 
+     * @throws ModelNotFoundException
      */
-    public function destroy(int $id)
+    public function destroy(Request $request, int $id)
     {
         $voucher = Voucher::findOrFail($id);
         $voucher->delete();
