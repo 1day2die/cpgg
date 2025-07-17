@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Constants\Roles;
 use App\Http\Resources\RoleResource;
 use App\Models\User;
 use App\Models\Role;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Roles\CreateRoleRequest;
+use App\Http\Requests\Api\Roles\UpdateRoleRequest;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -36,30 +39,17 @@ class RoleController extends Controller
      * @param  Request  $request
      * @return RoleResource
      */
-    public function store(Request $request)
+    public function store(CreateRoleRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:191',
-            'color' => [
-                'required',
-                'regex:/^#([a-f0-9]{6}|[a-f0-9]{3})$/i'
-            ],
-            'power' => 'required',
-        ]);
+        $data = $request->validated();
 
-        $role = Role::create([
-            'name' => $request->name,
-            'color' => $request->color,
-            'power' => $request->power,
-        ]);
+        $role = Role::create($data);
 
-        if ($request->permissions) {
-            $permissions = explode(",",$request->permissions);
-            $collectedPermissions = collect($permissions)->map(fn($val)=>(int)$val);
-            foreach($collectedPermissions as $permission){
-                $role->givePermissionTo($permission);
-            }
+        if (isset($data['permissions'])) {
+            $role->syncPermissions($data['permissions']);
         }
+
+        $role->load('permissions');
 
         return RoleResource::make($role);
     }
@@ -68,14 +58,14 @@ class RoleController extends Controller
      * Show the specified role.
      *
      * @param  Request  $request
-     * @param  int  $id
+     * @param  int  $roleId
      * @return RoleResource
      */
-    public function show(Request $request, int $id)
+    public function show(Request $request, int $roleId)
     {
         $role = QueryBuilder::for(Role::class)
-            ->where('id', '=', $id)
             ->allowedIncludes(self::ALLOWED_INCLUDES)
+            ->where('id', $roleId)
             ->firstOrFail();
 
         return RoleResource::make($role);
@@ -85,29 +75,20 @@ class RoleController extends Controller
      * Update the specified role in the system.
      *
      * @param  Request  $request
-     * @param  int  $id
+     * @param  Role  $role
      * @return RoleResource
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
-        $role = Role::findOrFail($id);
+        $data = $request->validated();
 
-        $request->validate([
-            'name' => 'sometimes|string|max:191',
-            'color' => [
-                'sometimes',
-                'regex:/^#([a-f0-9]{6}|[a-f0-9]{3})$/i'
-            ],
-            'power' => 'sometimes',
-        ]);
+        if (isset($data['permissions'])) {
+            $role->syncPermissions($data['permissions']);
 
-        if ($request->permissions) {
-            $permissions = explode(",",$request->permissions);
-            $collectedPermissions = collect($permissions)->map(fn($val)=>(int)$val);
-            $role->syncPermissions($collectedPermissions);
+            unset($data['permissions']);
         }
 
-        $role->update($request->except('permissions'));
+        $role->load('permissions')->update($data);
 
         return RoleResource::make($role);
     }
@@ -116,26 +97,23 @@ class RoleController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  Request  $request
-     * @param  int  $id
-     * @return RoleResource|\Illuminate\Http\JsonResponse
+     * @param  Role  $role
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    public function destroy(Request $request, int $id)
+    public function destroy(Request $request, Role $role)
     {
-        $role = Role::findOrFail($id);
-
-        if($role->id == 1 || $role->id == 3|| $role->id == 4){ //cannot delete admin and User role
-            return response()->json([
-                'error' => 'Not allowed to delete Admin, Client or Member'], 400);
+        if (!$role->isDeletable()) {
+            return response()->json(['error' => 'This role cannot be deleted.'], 403);
         }
 
         $users = User::role($role)->get();
 
         foreach($users as $user){
-            $user->syncRoles([4]);
+            $user->syncRoles([Roles::USER_ROLE_ID]);
         }
         
         $role->delete();
 
-        return RoleResource::make($role);
+        return response()->noContent();
     }
 }
