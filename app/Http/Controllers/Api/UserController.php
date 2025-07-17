@@ -6,7 +6,6 @@ use App\Classes\PterodactylClient;
 use App\Events\UserUpdateCreditsEvent;
 use App\Helpers\CurrencyHelper;
 use App\Http\Resources\UserResource;
-use App\Models\DiscordUser;
 use App\Models\User;
 use App\Notifications\ReferralNotification;
 use App\Settings\PterodactylSettings;
@@ -65,37 +64,34 @@ class UserController extends Controller
      * Show the specified user.
      *
      * @param  Request  $request
-     * @param  User  $user
+     * @param  int  $userId
      * @return UserResource
      * 
      * @throws ModelNotFoundException
      */
-    public function show(Request $request, User $user)
+    public function show(Request $request, int $userId)
     {
-        $userQuery = QueryBuilder::for(User::class)
+        $user = QueryBuilder::for(User::class)
             ->allowedIncludes(self::ALLOWED_INCLUDES)
-            ->where('id', $user->id)
+            ->where('id', $userId)
             ->firstOrFail();
 
-        return UserResource::make($userQuery);
+        return UserResource::make($user);
     }
 
     /**
      * Update the specified user in the system.
      *
      * @param  UpdateUserRequest  $request
-     * @param  int  $id
+     * @param  User  $user
      * @return UserResource
      * 
      * @throws ValidationException
      * @throws ModelNotFoundException
      */
-    public function update(UpdateUserRequest $request, int $id)
+    public function update(UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
-
-        $discordUser = DiscordUser::find($id);
-        $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
         try {
             $payload = array_filter([
@@ -143,18 +139,15 @@ class UserController extends Controller
      * Increments the credits/server_limit of the user.
      *
      * @param  IncrementRequest  $request
-     * @param  int  $id
+     * @param  User  $user
      * @return UserResource
      *
      * @throws ValidationException
      * @throws ModelNotFoundException
      */
-    public function increment(IncrementRequest $request, int $id)
+    public function increment(IncrementRequest $request, User $user)
     {
         $data = $request->validated();
-
-        $discordUser = DiscordUser::find($id);
-        $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
         if (isset($data['credits'])) {
             $user->increment('credits', $this->currencyHelper->prepareForDatabase($data['credits']));
@@ -173,18 +166,15 @@ class UserController extends Controller
      * Decrements the credits/server_limit of the user.
      *
      * @param  DecrementRequest  $request
-     * @param  int  $id
+     * @param  User  $user
      * @return UserResource
      *
      * @throws ModelNotFoundException
      * @throws ValidationException
      */
-    public function decrement(DecrementRequest $request, int $id)
+    public function decrement(DecrementRequest $request, User $user)
     {
         $data = $request->validated();
-
-        $discordUser = DiscordUser::find($id);
-        $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
         if (isset($data['credits'])) {
             $user->decrement('credits', $this->currencyHelper->prepareForDatabase($data['credits']));
@@ -201,16 +191,13 @@ class UserController extends Controller
      * Suspend the user and their servers.
      *
      * @param  Request  $request
-     * @param  int  $id
+     * @param  User  $user
      * @return UserResource|\Illuminate\Http\JsonResponse
      * 
      * @throws ModelNotFoundException
      */
-    public function suspend(Request $request, int $id)
+    public function suspend(Request $request, User $user)
     {
-        $discordUser = DiscordUser::find($id);
-        $user = $discordUser ? $discordUser->user : User::findOrFail($id);
-
         if ($user->isSuspended()) {
             return response()->json([
                 'error' => 'The user is already suspended',
@@ -226,16 +213,13 @@ class UserController extends Controller
      * Unsuspend the user and their servers if they has suficient credits.
      *
      * @param  Request  $request
-     * @param  int  $id
+     * @param  User  $user
      * @return UserResource|\Illuminate\Http\JsonResponse
      * 
      * @throws ModelNotFoundException
      */
-    public function unsuspend(Request $request, int $id)
+    public function unsuspend(Request $request, User $user)
     {
-        $discordUser = DiscordUser::find($id);
-        $user = $discordUser ? $discordUser->user : User::findOrFail($id);
-
         if (!$user->isSuspended()) {
             return response()->json([
                 'error' => 'The user is not suspended',
@@ -311,19 +295,16 @@ class UserController extends Controller
      * Remove the specified user from the system.
      *
      * @param  Request  $request
-     * @param  int  $id
-     * @return UserResource
+     * @param  User  $user
+     * @return \Illuminate\Http\Response
      * 
      * @throws ModelNotFoundException
      */
-    public function destroy(Request $request,int $id)
+    public function destroy(Request $request, User $user)
     {
-        $discordUser = DiscordUser::find($id);
-        $user = $discordUser ? $discordUser->user : User::findOrFail($id);
-
         $user->delete();
 
-        return UserResource::make($user);
+        return response()->noContent();
     }
 
     /**
