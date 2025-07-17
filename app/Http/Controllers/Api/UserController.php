@@ -13,24 +13,32 @@ use App\Settings\PterodactylSettings;
 use App\Settings\ReferralSettings;
 use App\Settings\UserSettings;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Users\CreateUserRequest;
+use App\Http\Requests\Api\Users\DecrementRequest;
+use App\Http\Requests\Api\Users\IncrementRequest;
+use App\Http\Requests\Api\Users\UpdateUserRequest;
+use App\Traits\Referral;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class UserController extends Controller
 {
+    use Referral;
+
     private $pterodactyl;
     private $currencyHelper;
+    private $referralSettings;
 
-    public function __construct(PterodactylSettings $ptero_settings, CurrencyHelper $currencyHelper)
+    public function __construct(PterodactylSettings $ptero_settings, ReferralSettings $referralSettings, CurrencyHelper $currencyHelper)
     {
         $this->pterodactyl = new PterodactylClient($ptero_settings);
+        $this->referralSettings = $referralSettings;
         $this->currencyHelper = $currencyHelper;
     }
 
@@ -38,10 +46,10 @@ class UserController extends Controller
     const ALLOWED_FILTERS = ['name', 'server_limit', 'email', 'pterodactyl_id', 'suspended'];
 
     /**
-     * Display a listing of the resource.
+     * Show a list of users.
      *
      * @param  Request  $request
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return UserResource
      */
     public function index(Request $request)
     {
@@ -54,165 +62,149 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Show the specified user.
      *
-     * @param  int  $id
-     * @return UserResource|\Illuminate\Database\Eloquent\ModelNotFoundException
+     * @param  Request  $request
+     * @param  User  $user
+     * @return UserResource
+     * 
+     * @throws ModelNotFoundException
      */
-    public function show(int $id)
+    public function show(Request $request, User $user)
     {
-        $discordUser = DiscordUser::find($id);
-        $userQuery = $discordUser
-            ? $discordUser->user()->getQuery()
-            : User::query();
-
-        $user = QueryBuilder::for($userQuery)
-            ->with('discordUser')
+        $userQuery = QueryBuilder::for(User::class)
             ->allowedIncludes(self::ALLOWED_INCLUDES)
-            ->where('users.id', '=', $id)
-            ->orWhereHas('discordUser', function (Builder $builder) use ($id) {
-                $builder->where('id', '=', $id);
-            })
+            ->where('id', $user->id)
             ->firstOrFail();
 
-        return UserResource::make($user);
+        return UserResource::make($userQuery);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified user in the system.
      *
-     * @param  Request  $request
+     * @param  UpdateUserRequest  $request
      * @param  int  $id
-     * @return UserResource|Illuminate\Database\Eloquent\ModelNotFoundExpcetion
+     * @return UserResource
      * 
      * @throws ValidationException
+     * @throws ModelNotFoundException
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateUserRequest $request, int $id)
     {
+        $data = $request->validated();
+
         $discordUser = DiscordUser::find($id);
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
-        $request->validate([
-            'name' => 'required|string|min:4|max:30',
-            'email' => 'required|string|email',
-            'credits' => 'sometimes|numeric|min:0.01|max:50000',
-            'server_limit' => 'sometimes|numeric|min:0|max:1000000',
-        ]);
+        try {
+            $payload = array_filter([
+                'username' => $data['name'],
+                'first_name' => $data['name'],
+                'last_name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'] ?? null,
+            ]);
 
-        event(new UserUpdateCreditsEvent($user));
+            $response = $this->pterodactyl->application->patch('/application/users/' . $user->pterodactyl_id, $payload);
 
-        //Update Users Password on Pterodactyl
-        //Username,Mail,First and Lastname are required aswell
-        $response = $this->pterodactyl->application->patch('/application/users/'.$user->pterodactyl_id, [
-            'username' => $request->name,
-            'first_name' => $request->name,
-            'last_name' => $request->name,
-            'email' => $request->email,
-        ]);
+            if ($response->failed()) {
+                throw ValidationException::withMessages([
+                    'pterodactyl_error_message' => $response->toException()->getMessage(),
+                    'pterodactyl_error_status' => $response->toException()->getCode(),
+                ]);
+            }
 
-        if ($response->failed()) {
+            if (isset($data['role'])) {
+                $collectedRoles = collect($data['role'])->map(fn($val) => (int)$val);
+                $user->syncRoles($collectedRoles);
+                unset($data['role']);
+            }
+
+            $dataPayload = array_filter([
+                ...$data,
+                'password' => $data['password'] ? Hash::make($data['password']) : null,
+            ]);
+
+            $user->update($dataPayload);
+
+            event(new UserUpdateCreditsEvent($user));
+
+            return UserResource::make($user);
+        } catch (Exception $e) {
             throw ValidationException::withMessages([
-                'pterodactyl_error_message' => $response->toException()->getMessage(),
-                'pterodactyl_error_status' => $response->toException()->getCode(),
+                'pterodactyl_error_message' => $e->getMessage(),
+                'pterodactyl_error_status' => $e->getCode(),
             ]);
         }
-        if($request->has("role")){
-            $collectedRoles = collect($request->role)->map(fn($val)=>(int)$val);
-            $user->syncRoles($collectedRoles);
-        }
-
-        $user->update($request->except('role'));
-
-        return UserResource::make($user);
     }
 
     /**
-     * increments the users credits or/and server_limit
+     * Increments the credits/server_limit of the user.
      *
-     * @param  Request  $request
+     * @param  IncrementRequest  $request
      * @param  int  $id
-     * @return UserResource|\Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return UserResource
      *
      * @throws ValidationException
+     * @throws ModelNotFoundException
      */
-    public function increment(Request $request, int $id)
+    public function increment(IncrementRequest $request, int $id)
     {
+        $data = $request->validated();
+
         $discordUser = DiscordUser::find($id);
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
-        $request->validate([
-            'credits' => 'sometimes|numeric|min:0.01|max:50000',
-            'server_limit' => 'sometimes|numeric|min:0|max:1000000',
-        ]);
+        if (isset($data['credits'])) {
+            $user->increment('credits', $this->currencyHelper->prepareForDatabase($data['credits']));
 
-        if ($request->credits) {
-            if ($user->credits + $request->credits >= $this->currencyHelper->prepareForDatabase(50000)) {
-                throw ValidationException::withMessages([
-                    'credits' => __("You can't add this amount of credits because you would exceed the credit limit"),
-                ]);
-            }
             event(new UserUpdateCreditsEvent($user));
-            $user->increment('credits', $this->currencyHelper->prepareForDatabase($request->credits));
         }
 
-        if ($request->server_limit) {
-            if ($user->server_limit + $request->server_limit >= 2147483647) {
-                throw ValidationException::withMessages([
-                    'server_limit' => __("You cannot add this amount of servers because it would exceed the server limit."),
-                ]);
-            }
-            $user->increment('server_limit', $request->server_limit);
+        if (isset($data['server_limit'])) {
+            $user->increment('server_limit', $data['server_limit']);
         }
 
         return UserResource::make($user->fresh());
     }
 
     /**
-     * decrements the users credits or/and server_limit
+     * Decrements the credits/server_limit of the user.
      *
-     * @param  Request  $request
+     * @param  DecrementRequest  $request
      * @param  int  $id
-     * @return UserResource|\Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return UserResource
      *
+     * @throws ModelNotFoundException
      * @throws ValidationException
      */
-    public function decrement(Request $request, int $id)
+    public function decrement(DecrementRequest $request, int $id)
     {
+        $data = $request->validated();
+
         $discordUser = DiscordUser::find($id);
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
-        $request->validate([
-            'credits' => 'sometimes|numeric|min:0.01|max:50000',
-            'server_limit' => 'sometimes|numeric|min:0|max:1000000',
-        ]);
-
-        if ($request->credits) {
-            if ($user->credits - $this->currencyHelper->prepareForDatabase($request->credits) < 0) {
-                throw ValidationException::withMessages([
-                    'credits' => __("You can't remove this amount of credits because you would exceed the minimum credit limit"),
-                ]);
-            }
-            $user->decrement('credits', $this->currencyHelper->prepareForDatabase($request->credits));
+        if (isset($data['credits'])) {
+            $user->decrement('credits', $this->currencyHelper->prepareForDatabase($data['credits']));
         }
 
-        if ($request->server_limit) {
-            if ($user->server_limit - $request->server_limit < 0) {
-                throw ValidationException::withMessages([
-                    'server_limit' => __("You cannot remove this amount of servers because it would exceed the minimum server."),
-                ]);
-            }
-            $user->decrement('server_limit', $request->server_limit);
+        if (isset($data['server_limit'])) {
+            $user->decrement('server_limit', $data['server_limit']);
         }
 
         return UserResource::make($user->fresh());
     }
 
     /**
-     * Suspends the user
+     * Suspend the user and their servers.
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return UserResource|\Illuminate\Http\JsonResponse|\Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return UserResource|\Illuminate\Http\JsonResponse
+     * 
+     * @throws ModelNotFoundException
      */
     public function suspend(Request $request, int $id)
     {
@@ -221,7 +213,7 @@ class UserController extends Controller
 
         if ($user->isSuspended()) {
             return response()->json([
-                'error' => __('The user is already suspended'),
+                'error' => 'The user is already suspended',
             ], 400);
         }
         
@@ -231,20 +223,22 @@ class UserController extends Controller
     }
 
     /**
-     * Unsuspend the user
+     * Unsuspend the user and their servers if they has suficient credits.
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return UserResource|\Illuminate\Http\JsonResponse|\Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return UserResource|\Illuminate\Http\JsonResponse
+     * 
+     * @throws ModelNotFoundException
      */
     public function unsuspend(Request $request, int $id)
     {
         $discordUser = DiscordUser::find($id);
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
 
-        if (! $user->isSuspended()) {
+        if (!$user->isSuspended()) {
             return response()->json([
-                'error' => __('The user is not suspended'),
+                'error' => 'The user is not suspended',
             ], 400);
         }
 
@@ -254,103 +248,75 @@ class UserController extends Controller
     }
 
     /**
-     * Create a unique Referral Code for User
-     *
-     * @return string
-     */
-    protected function createReferralCode()
-    {
-        $referralcode = STR::random(8);
-        if (User::where('referral_code', '=', $referralcode)->exists()) {
-            $this->createReferralCode();
-        }
-
-        return $referralcode;
-    }
-
-    /**
-     * @param Request  $request
-     * @param UserSettings $userSettings
+     * Create a new user in the system.
+     * 
+     * @param CreateUserRequest  $request
      * @return UserResource
      * 
      * @throws ValidationException
      */
-    public function store(Request $request, UserSettings $userSettings, ReferralSettings $referralSettings)
+    public function store(CreateUserRequest $request, UserSettings $userSettings)
     {
-        $request->validate([
-            'name' => ['required', 'string', 'max:30', 'min:4', 'alpha_num', 'unique:users'],
-            'email' => ['required', 'string', 'email', 'max:64', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'max:191'],
-        ]);
+        $data = $request->validated();
 
-        // Prevent the creation of new users via API if this is enabled.
-        if (! $userSettings->creation_enabled) {
-            throw ValidationException::withMessages([
-                'error' => 'The creation of new users has been blocked by the system administrator.',
+        try {
+            $response = $this->pterodactyl->application->post('/application/users', [
+                'external_id' => "0",
+                'username' => $data['name'],
+                'email' => $data['email'],
+                'first_name' => $data['name'],
+                'last_name' => $data['name'],
+                'password' => $data['password'],
+                'root_admin' => false,
+                'language' => 'en',
             ]);
-        }
 
-        $user = User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'credits' => $userSettings->initial_credits,
-            'server_limit' => $userSettings->initial_server_limit,
-            'password' => Hash::make($request->input('password')),
-            'referral_code' => $this->createReferralCode(),
-        ]);
-
-        $response = $this->pterodactyl->application->post('/application/users', [
-            'external_id' => App::environment('local') ? Str::random(16) : (string) $user->id,
-            'username' => $user->name,
-            'email' => $user->email,
-            'first_name' => $user->name,
-            'last_name' => $user->name,
-            'password' => $request->input('password'),
-            'root_admin' => false,
-            'language' => 'en',
-        ]);
-
-        if ($response->failed()) {
-            $user->delete();
-            throw ValidationException::withMessages([
-                'pterodactyl_error_message' => $response->toException()->getMessage(),
-                'pterodactyl_error_status' => $response->toException()->getCode(),
-            ]);
-        }
-
-        $user->update([
-            'pterodactyl_id' => $response->json()['attributes']['id'],
-        ]);
-        //INCREMENT REFERRAL-USER CREDITS
-        if (! empty($request->input('referral_code'))) {
-            $ref_code = $request->input('referral_code');
-            $new_user = $user->id;
-            if ($ref_user = User::query()->where('referral_code', '=', $ref_code)->first()) {
-                if ($referralSettings->mode == 'register' || $referralSettings->mode == 'both') {
-                    $ref_user->increment('credits', $referralSettings->reward);
-                    $ref_user->notify(new ReferralNotification($ref_user->id, $new_user));
-                }
-                //INSERT INTO USER_REFERRALS TABLE
-                DB::table('user_referrals')->insert([
-                    'referral_id' => $ref_user->id,
-                    'registered_user_id' => $user->id,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
+            if ($response->failed()) {
+                throw ValidationException::withMessages([
+                    'pterodactyl_error_message' => $response->toException()->getMessage(),
+                    'pterodactyl_error_status' => $response->toException()->getCode(),
                 ]);
             }
-        }
-        $user->sendEmailVerificationNotification();
 
-        return UserResource::make($user);
+            $role = $data['role'];
+            unset($data['role']);
+
+            $user = User::create([
+                ...$data,
+                'credits' => $data['credits'] ?? $userSettings->initial_credits,
+                'server_limit' => $data['server_limit'] ?? $userSettings->initial_server_limit,
+                'referral_code' => $this->createReferralCode(),
+                'pterodactyl_id' => $response->json()['attributes']['id'],
+            ]);
+
+            if($role) {
+                $collectedRoles = collect($role)->map(fn($val)=>(int)$val);
+                $user->syncRoles($collectedRoles);
+            }
+
+            $this->incrementReferralUserCredits($user, $data);
+
+            $user->sendEmailVerificationNotification();
+
+            return UserResource::make($user);
+        } catch (Exception $e) {
+            throw ValidationException::withMessages([
+                'pterodactyl_error_message' => $e->getMessage(),
+                'pterodactyl_error_status' => $e->getCode(),
+            ]);
+        };
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified user from the system.
      *
+     * @param  Request  $request
      * @param  int  $id
-     * @return UserResource|\Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return UserResource
+     * 
+     * @throws ModelNotFoundException
      */
-    public function destroy(int $id)
+    public function destroy(Request $request,int $id)
     {
         $discordUser = DiscordUser::find($id);
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
@@ -358,5 +324,34 @@ class UserController extends Controller
         $user->delete();
 
         return UserResource::make($user);
+    }
+
+    /**
+     * Increment the credits for the referring user.
+     *
+     * @param  User  $user
+     * @param  mixed  $data
+     * @return void
+     */
+    private function incrementReferralUserCredits(User $user, mixed $data)
+    {
+        if (!isset($data['referral_code'])) return;
+
+        $ref_code = $data['referral_code'];
+        $ref_user = User::query()->where('referral_code', $ref_code)->first();
+
+        if ($ref_user) {
+            if ($this->referralSettings->mode == 'sign-up' || $this->referralSettings->mode == 'both') {
+                $ref_user->increment('credits', $this->referralSettings->reward);
+                $ref_user->notify(new ReferralNotification($user));
+            }
+
+            DB::table('user_referrals')->insert([
+                'referral_id' => $ref_user->id,
+                'registered_user_id' => $user->id,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+        }
     }
 }
