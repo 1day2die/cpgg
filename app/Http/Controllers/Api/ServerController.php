@@ -41,8 +41,8 @@ class ServerController extends Controller
     public function show(Request $request, string $serverId)
     {
         $server = QueryBuilder::for(Server::class)
-            ->where('id', $serverId)
             ->allowedIncludes(self::ALLOWED_INCLUDES)
+            ->where('id', $serverId)
             ->firstOrFail();
 
         return ServerResource::make($server);
@@ -52,34 +52,25 @@ class ServerController extends Controller
      * Remove the specified server from the system.
      *
      * @param  Request  $request
-     * @param  string  $serverId
-     * @return ServerResource
+     * @param  Server  $server
+     * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, string $serverId)
+    public function destroy(Request $request, Server $server)
     {
-        $server = QueryBuilder::for(Server::class)
-            ->where('id', $serverId)
-            ->firstOrFail();
-
         $server->delete();
 
-        return ServerResource::make($server);
+        return response()->noContent();
     }
 
     /**
      * Suspend server.
      *
      * @param  Request  $request
-     * @param  string  $serverId
+     * @param  Server  $server
      * @return ServerResource|JsonResponse
      */
-    public function suspend(Request $request, string $serverId)
+    public function suspend(Request $request, Server $server)
     {
-        $server = QueryBuilder::for(Server::class)
-            ->where('id', $serverId)
-            ->allowedIncludes(self::ALLOWED_INCLUDES)
-            ->firstOrFail();
-
         try {
             $server->suspend();
         } catch (Exception $exception) {
@@ -93,16 +84,11 @@ class ServerController extends Controller
      * Unsuspend server.
      *
      * @param  Request  $request
-     * @param  string  $serverId
+     * @param  Server  $server
      * @return ServerResource|JsonResponse
      */
-    public function unSuspend(Request $request, string $serverId)
+    public function unSuspend(Request $request, Server $server)
     {
-        $server = QueryBuilder::for(Server::class)
-            ->where('id', $serverId)
-            ->allowedIncludes(self::ALLOWED_INCLUDES)
-            ->firstOrFail();
-
         try {
             $server->unSuspend();
         } catch (Exception $exception) {
