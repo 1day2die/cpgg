@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Models\Voucher;
 use App\Http\Resources\VoucherResource;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Api\Vouchers\CreateVoucherRequest;
+use App\Http\Requests\Api\Vouchers\UpdateVoucherRequest;
 use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class VoucherController extends Controller
@@ -36,16 +38,10 @@ class VoucherController extends Controller
      * @param  Request  $request
      * @return VoucherResource
      */
-    public function store(Request $request)
+    public function store(CreateVoucherRequest $request)
     {
-        $data = $request->validate([
-            'memo' => 'nullable|string|max:191',
-            'code' => 'required|string|alpha_dash|max:36|min:4|unique:vouchers',
-            'uses' => 'required|numeric|max:2147483647|min:1',
-            'credits' => 'required|numeric|min:0.01|max:50000',
-            'expires_at' => 'nullable|multiple_date_format:d-m-Y H:i:s,d-m-Y|after:now|before:10 years',
-        ]);
-
+        $data = $request->validated();
+        
         $voucher = Voucher::create($data);
 
         return VoucherResource::make($voucher);
@@ -55,16 +51,16 @@ class VoucherController extends Controller
      * Show the specified voucher.
      *
      * @param Request $request
-     * @param  int  $id
+     * @param  int  $voucherId
      * @return VoucherResource
      * 
      * @throws ModelNotFoundException
      */
-    public function show(Request $request, int $id)
+    public function show(Request $request, int $voucherId)
     {
         $voucher = QueryBuilder::for(Voucher::class)
-            ->where('id', '=', $id)
             ->allowedIncludes(self::ALLOWED_INCLUDES)
+            ->where('id', $voucherId)
             ->firstOrFail();
 
         return VoucherResource::make($voucher);
@@ -74,22 +70,14 @@ class VoucherController extends Controller
      * Update the specified voucher in the system.
      *
      * @param  Request  $request
-     * @param  int  $id
+     * @param  Voucher  $voucher
      * @return VoucherResource
      * 
      * @throws ModelNotFoundException
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateVoucherRequest $request, Voucher $voucher)
     {
-        $voucher = Voucher::findOrFail($id);
-
-        $data = $request->validate([
-            'memo' => 'nullable|string|max:191',
-            'code' => "required|string|alpha_dash|max:36|min:4|unique:vouchers,code,{$voucher->id}",
-            'uses' => 'required|numeric|max:2147483647|min:1',
-            'credits' => 'required|numeric|min:0.01|max:50000',
-            'expires_at' => 'nullable|multiple_date_format:d-m-Y H:i:s,d-m-Y|after:now|before:10 years',
-        ]);
+        $data = $request->validated();
 
         $voucher->update($data);
 
@@ -100,16 +88,15 @@ class VoucherController extends Controller
      * Remove the specified voucher from the system.
      *
      * @param  Request  $request
-     * @param  int  $id
-     * @return VoucherResource
+     * @param  Voucher  $voucher
+     * @return \Illuminate\Http\Response
      * 
      * @throws ModelNotFoundException
      */
-    public function destroy(Request $request, int $id)
+    public function destroy(Request $request, Voucher $voucher)
     {
-        $voucher = Voucher::findOrFail($id);
         $voucher->delete();
 
-        return VoucherResource::make($voucher);
+        return response()->noContent();
     }
 }
