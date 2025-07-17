@@ -33,9 +33,11 @@ Route::middleware('api.token')->group(function () {
 
     Route::resource('roles', RoleController::class);
 
-    Route::get('/notifications/{user}', [NotificationController::class, 'index']);
-    Route::get('/notifications/{user}/{notification}', [NotificationController::class, 'view']);
-    Route::post('/notifications', [NotificationController::class, 'send']);
-    Route::delete('/notifications/{user}/{notification}', [NotificationController::class, 'deleteOne']);
-    Route::delete('/notifications/{user}', [NotificationController::class, 'delete']);
+    Route::scopeBindings()->group(function () {
+        Route::get('/notifications/{user}', [NotificationController::class, 'index'])->withoutScopedBindings();
+        Route::get('/notifications/{user}/{notification}', [NotificationController::class, 'view']);
+        Route::post('/notifications', [NotificationController::class, 'send'])->withoutScopedBindings();
+        Route::delete('/notifications/{user}/{notification}', [NotificationController::class, 'deleteOne']);
+        Route::delete('/notifications/{user}', [NotificationController::class, 'delete'])->withoutScopedBindings();
+    });
 });

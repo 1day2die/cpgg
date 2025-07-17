@@ -146,6 +146,12 @@ class User extends Authenticatable implements MustVerifyEmail
         );
     }
 
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable')
+            ->orderBy('created_at', 'desc');
+    }
+
     /**
      * @return HasMany
      */
