@@ -13,14 +13,16 @@ class NotificationService
     /**
      * Send notification to multiple users
      */
-    public function sendToUsers(Collection $users, array $via, ?array $database = null, ?MailMessage $mail = null): void {
+    public function sendToUsers(Collection $users, array $via, ?array $database = null, ?MailMessage $mail = null): void
+    {
         Notification::send($users, new DynamicNotification($via, $database, $mail));
     }
 
     /**
      * Send notification to single user
      */
-    public function sendToUser(User $user, array $via, ?array $database = null, ?MailMessage $mail = null): void {
+    public function sendToUser(User $user, array $via, ?array $database = null, ?MailMessage $mail = null): void
+    {
         $user->notify(new DynamicNotification($via, $database, $mail));
     }
 

@@ -26,6 +26,9 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\QueryBuilder\QueryBuilder;
 
+/**
+ * @group User Management
+ */
 class UserController extends Controller
 {
     use Referral;

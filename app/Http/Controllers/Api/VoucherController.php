@@ -11,6 +11,9 @@ use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+/**
+ * @group Voucher Management
+ */
 class VoucherController extends Controller
 {
     const ALLOWED_INCLUDES = ['users'];

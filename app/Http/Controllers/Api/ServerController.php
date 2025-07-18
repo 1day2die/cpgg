@@ -10,6 +10,9 @@ use Spatie\QueryBuilder\QueryBuilder;
 use App\Http\Controllers\Controller;
 use Exception;
 
+/**
+ * @group Server Management
+ */
 class ServerController extends Controller
 {
     public const ALLOWED_INCLUDES = ['product', 'user'];

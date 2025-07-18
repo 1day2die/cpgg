@@ -12,6 +12,9 @@ use App\Http\Requests\Api\Roles\UpdateRoleRequest;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
+/**
+ * @group Role Management
+ */
 class RoleController extends Controller
 {
     const ALLOWED_INCLUDES = ['permissions', 'users'];

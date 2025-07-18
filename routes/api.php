@@ -19,11 +19,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('api.token')->group(function () {
+    Route::resource('users', UserController::class)->except(['create']);
     Route::patch('/users/{user}/increment', [UserController::class, 'increment']);
     Route::patch('/users/{user}/decrement', [UserController::class, 'decrement']);
     Route::patch('/users/{user}/suspend', [UserController::class, 'suspend']);
     Route::patch('/users/{user}/unsuspend', [UserController::class, 'unsuspend']);
-    Route::resource('users', UserController::class)->except(['create']);
 
     Route::patch('/servers/{server}/suspend', [ServerController::class, 'suspend']);
     Route::patch('/servers/{server}/unsuspend', [ServerController::class, 'unSuspend']);
@@ -36,7 +36,8 @@ Route::middleware('api.token')->group(function () {
     Route::scopeBindings()->group(function () {
         Route::get('/notifications/{user}', [NotificationController::class, 'index'])->withoutScopedBindings();
         Route::get('/notifications/{user}/{notification}', [NotificationController::class, 'view']);
-        Route::post('/notifications', [NotificationController::class, 'send'])->withoutScopedBindings();
+        Route::post('/notifications/send-to-all', [NotificationController::class, 'sendToAll'])->withoutScopedBindings();
+        Route::post('/notifications/send-to-users', [NotificationController::class, 'sendToUsers'])->withoutScopedBindings();
         Route::delete('/notifications/{user}/{notification}', [NotificationController::class, 'deleteOne']);
         Route::delete('/notifications/{user}', [NotificationController::class, 'delete'])->withoutScopedBindings();
     });

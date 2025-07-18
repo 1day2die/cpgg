@@ -19,6 +19,7 @@
         "hidehalo/nanoid-php": "^1.1.12",
         "josiasmontag/laravel-recaptchav3": "^1.0",
         "kkomelin/laravel-translatable-string-exporter": "^1.22",
+        "knuckleswtf/scribe": "^5.2",
         "laravel/framework": "^11.32",
         "laravel/tinker": "^2.10",
         "laravel/ui": "^4.5.2",
