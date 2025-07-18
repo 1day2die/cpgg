@@ -102,7 +102,7 @@ class UserController extends Controller
                 'first_name' => $data['name'],
                 'last_name' => $data['name'],
                 'email' => $data['email'],
-                'password' => $data['password'] ?? null,
+                'password' => isset($data['password']) ? $data['password'] : null,
             ]);
 
             $response = $this->pterodactyl->application->patch('/application/users/' . $user->pterodactyl_id, $payload);
@@ -122,7 +122,7 @@ class UserController extends Controller
 
             $dataPayload = array_filter([
                 ...$data,
-                'password' => $data['password'] ? Hash::make($data['password']) : null,
+                'password' => isset($data['password']) ? Hash::make($data['password']) : null,
             ]);
 
             $user->update($dataPayload);
@@ -131,6 +131,8 @@ class UserController extends Controller
 
             return UserResource::make($user);
         } catch (Exception $e) {
+            report($e);
+
             throw ValidationException::withMessages([
                 'pterodactyl_error_message' => $e->getMessage(),
                 'pterodactyl_error_status' => $e->getCode(),
