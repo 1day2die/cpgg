@@ -34,7 +34,6 @@ class UserResource extends JsonResource
             'ip' => $this->ip,
             'suspended' => $this->suspended,
             'referral_code' => $this->referral_code,
-            'discord_user' => $this->discord_user,
             'email_verified_reward' => $this->email_verified_reward,
             'discord_verified_at' => $this->discord_verified_at,
             'last_seen' => $this->last_seen,
@@ -47,6 +46,7 @@ class UserResource extends JsonResource
             'payments' => PaymentResource::collection($this->whenLoaded('payments')),
             'vouchers' => VoucherResource::collection($this->whenLoaded('vouchers')),
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
+            'discordUser' => DiscordUserResource::make($this->whenLoaded('discordUser')),
         ];
     }
 }
