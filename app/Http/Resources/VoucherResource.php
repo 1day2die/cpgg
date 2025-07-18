@@ -32,6 +32,8 @@ class VoucherResource extends JsonResource
             'expires_at' => $this->expires_at ? $this->expires_at->toDateTimeString() : null,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
+            'users_count' => $this->whenCounted('users'),
+            'users_exists' => $this->whenExistsLoaded('users'),
             'users' => UserResource::newCollection($this->whenLoaded('users')),
         ];
     }
