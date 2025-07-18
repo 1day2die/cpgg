@@ -9,8 +9,11 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CreateUserRequest extends FormRequest
 {
-    public function __construct(protected UserSettings $userSettings)
+    private UserSettings $userSettings;
+
+    public function __construct()
     {
+        $this->userSettings = app(UserSettings::class);
         parent::__construct();
     }
 

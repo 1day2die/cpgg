@@ -25,7 +25,6 @@ class DecrementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user' => 'required|integer|exists:users,id',
             'credits' => ['sometimes', 'numeric', 'min:1'],
             'server_limit' => ['sometimes', 'numeric', 'min:1']
         ];
@@ -34,7 +33,7 @@ class DecrementRequest extends FormRequest
     public function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {
-            $user = User::find($this->input('user'));
+            $user = $this->route('user');
 
             $newCredits = $user->credits - $this->input('credits') * 1000;
             $newServerLimit = $user->server_limit - $this->input('server_limit');
@@ -53,13 +52,5 @@ class DecrementRequest extends FormRequest
                 );
             }
         });
-    }
-
-    /**
-     * Prepare the data for validation.
-     */
-    protected function prepareForValidation()
-    {
-        $this->merge(['user' => $this->route('user')]);
     }
 }

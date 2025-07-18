@@ -25,7 +25,6 @@ class IncrementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user' => 'required|integer|exists:users,id',
             'credits' => ['sometimes', 'numeric',
                 'min:' . MysqlLimits::CREDITS_MIN,
                 'max:' . MysqlLimits::CREDITS_MAX,
@@ -40,7 +39,7 @@ class IncrementRequest extends FormRequest
     public function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {
-            $user = User::find($this->input('user'));
+            $user = $this->route('user');
             
             $newCredits = $user->credits + ($this->input('credits') * 1000);
             $newServerLimit = $user->server_limit + $this->input('server_limit');
@@ -53,13 +52,5 @@ class IncrementRequest extends FormRequest
                 $validator->errors()->add('server_limit', "Adding {$this->input('server_limit')} server limit would result in {$newServerLimit}, exceeding the maximum limit of " . MysqlLimits::SERVER_LIMIT_MAX . ".");
             }
         });
-    }
-
-    /**
-     * Prepare the data for validation.
-     */
-    protected function prepareForValidation()
-    {
-        $this->merge(['user' => $this->route('user')]);
     }
 }
