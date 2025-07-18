@@ -27,7 +27,7 @@ class UpdateVoucherRequest extends FormRequest
             'memo' => 'nullable|string|max:191',
             'uses' => 'required|numeric|max:2147483647|min:1',
             'code' => ['required', 'string', 'alpha_dash', 'min:4', 'max:36',
-                Rule::unique('vouchers')->ignore($this->voucher->id)
+                Rule::unique('vouchers')->ignore($this->route('voucher')?->id), // Make the voucher nullable because stribe don't support unique validation rule.
             ],
             'credits' => ['required', 'numeric', 
                 'min:' . MysqlLimits::CREDITS_MIN,

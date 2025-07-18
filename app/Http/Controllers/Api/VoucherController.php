@@ -54,19 +54,19 @@ class VoucherController extends Controller
      * Show the specified voucher.
      *
      * @param Request $request
-     * @param  int  $voucherId
+     * @param  int  $voucher
      * @return VoucherResource
      * 
      * @throws ModelNotFoundException
      */
-    public function show(Request $request, int $voucherId)
+    public function show(Request $request, int $voucher)
     {
-        $voucher = QueryBuilder::for(Voucher::class)
+        $voucherQuery = QueryBuilder::for(Voucher::class)
             ->allowedIncludes(self::ALLOWED_INCLUDES)
-            ->where('id', $voucherId)
+            ->where('id', $voucher)
             ->firstOrFail();
 
-        return VoucherResource::make($voucher);
+        return VoucherResource::make($voucherQuery);
     }
 
     /**
