@@ -28,7 +28,11 @@ class ServerResource extends JsonResource
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
             'last_billed' => $this->last_billed,
+            'product_count' => $this->whenCounted('product'),
+            'product_exists' => $this->whenExistsLoaded('product'),
             'product' => ProductResource::make($this->whenLoaded('product')),
+            'user_count' => $this->whenCounted('user'),
+            'user_exists' => $this->whenExistsLoaded('user'),
             'user' => UserResource::make($this->whenLoaded('user')),
         ];
     }
