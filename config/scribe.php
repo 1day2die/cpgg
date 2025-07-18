@@ -185,7 +185,7 @@ return [
     // For example, if your logo is in public/img:
     // - 'logo' => '../img/logo.png' // for `static` type (output folder is public/docs)
     // - 'logo' => 'img/logo.png' // for `laravel` type
-    'logo' => false,
+    'logo' => '../images/ctrlpanel_logo.png',
 
     // Customize the "Last updated" value displayed in the docs by specifying tokens and formats.
     // Examples:
