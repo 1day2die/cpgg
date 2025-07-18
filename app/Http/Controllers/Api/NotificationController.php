@@ -6,7 +6,8 @@ use App\Http\Resources\NotificationResource;
 use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Models\Notification as ModelNotification;
-use App\Http\Requests\Api\Notifications\SendNotificationRequest;
+use App\Http\Requests\Api\Notifications\SendToAllUsersNotificationRequest;
+use App\Http\Requests\Api\Notifications\SendToUsersNotificationRequest;
 use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,9 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use Exception;
 
+/**
+ * @group Notification Management
+ */
 class NotificationController extends Controller
 {
     public function __construct(protected NotificationService $notificationService)
@@ -48,14 +52,14 @@ class NotificationController extends Controller
     }
 
     /**
-     * Send a notification to an user.
+     * Send a notification to specific users.
      *
-     * @param  Request  $request
+     * @param  SendToUsersNotificationRequest  $request
      * @return JsonResponse
      *
      * @throws ValidationException
      */
-    public function send(SendNotificationRequest $request)
+    public function sendToUsers(SendToUsersNotificationRequest $request)
     {
         try {
             $data = $request->validated();
@@ -78,6 +82,53 @@ class NotificationController extends Controller
                 : null;
             
             $users = $this->getTargetUsers($data);
+            
+            $this->notificationService->sendToUsers($users, $via, $database, $mail);
+
+            return response()->json([
+                'message' => 'Notification sent successfully.',
+                'meta' => [
+                    'user_count' => $users->count(),
+                    'channels' => $via
+                ]
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Failed to send notification.',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Send a notification to all users.
+     *
+     * @param  SendToAllUsersNotificationRequest  $request
+     * @return JsonResponse
+     */
+    public function sendToAll(SendToAllUsersNotificationRequest $request)
+    {
+        try {
+            $data = $request->validated();
+            
+            $via = match($data['via']) {
+                'mail' => ['mail'],
+                'database' => ['database'],
+                'both' => ['mail', 'database'],
+            };
+            
+            $database = in_array('database', $via) ? [
+                'title' => $data['title'],
+                'content' => $data['content'],
+            ] : null;
+            
+            $mail = in_array('mail', $via) ? 
+                (new MailMessage)
+                    ->subject($data['title'])
+                    ->line(new HtmlString($data['content']))
+                : null;
+            
+            $users = User::all();
             
             $this->notificationService->sendToUsers($users, $via, $database, $mail);
 
@@ -135,17 +186,12 @@ class NotificationController extends Controller
      *
      * @param array $data
      * @return \Illuminate\Database\Eloquent\Collection
+     * 
      * @throws ValidationException
      */
     private function getTargetUsers(array $data): \Illuminate\Database\Eloquent\Collection
-    {
-        if ($data['all'] ?? false) {
-            return User::all();
-        }
-
-        $userIds = array_filter(array_map('trim', explode(',', $data['users'])));
-        
-        $users = User::query()->whereIn('id', $userIds)->get();
+    {        
+        $users = User::query()->whereIn('id', $data['users'])->get();
 
         if ($users->isEmpty()) {
             throw ValidationException::withMessages([
