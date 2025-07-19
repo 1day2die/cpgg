@@ -22,8 +22,85 @@ endpoints:
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
-    queryParameters: []
-    cleanQueryParameters: []
+    queryParameters:
+      include:
+        name: include
+        description: 'Comma-separated list of related resources to include.'
+        required: false
+        example: include=users
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      'filter[code]':
+        name: 'filter[code]'
+        description: 'Filter by voucher code.'
+        required: false
+        example: VOUCHER2024
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      'filter[memo]':
+        name: 'filter[memo]'
+        description: 'Filter by voucher memo.'
+        required: false
+        example: Promocional
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      'filter[credits]':
+        name: 'filter[credits]'
+        description: 'numeric Filter by credits.'
+        required: false
+        example: '100'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      'filter[uses]':
+        name: 'filter[uses]'
+        description: 'Filter by number of uses.'
+        required: false
+        example: 10
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      per_page:
+        name: per_page
+        description: 'Number of items per page (default: 50).'
+        required: false
+        example: 25
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      page:
+        name: page
+        description: 'Page number.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      include: include=users
+      'filter[code]': VOUCHER2024
+      'filter[memo]': Promocional
+      'filter[credits]': '100'
+      'filter[uses]': 10
+      per_page: 25
+      page: 1
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -35,7 +112,7 @@ endpoints:
           cache-control: 'no-cache, private'
           content-type: application/json
           x-ratelimit-limit: '60'
-          x-ratelimit-remaining: '55'
+          x-ratelimit-remaining: '45'
           access-control-allow-origin: '*'
         description: null
         custom: []
@@ -167,8 +244,85 @@ endpoints:
         custom: []
     cleanUrlParameters:
       id: architecto
-    queryParameters: []
-    cleanQueryParameters: []
+    queryParameters:
+      include:
+        name: include
+        description: 'Comma-separated list of related resources to include.'
+        required: false
+        example: include=users
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      'filter[code]':
+        name: 'filter[code]'
+        description: 'Filter by voucher code.'
+        required: false
+        example: VOUCHER2024
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      'filter[memo]':
+        name: 'filter[memo]'
+        description: 'Filter by voucher memo.'
+        required: false
+        example: Promocional
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      'filter[credits]':
+        name: 'filter[credits]'
+        description: 'numeric Filter by credits.'
+        required: false
+        example: '100'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      'filter[uses]':
+        name: 'filter[uses]'
+        description: 'Filter by number of uses.'
+        required: false
+        example: 10
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      per_page:
+        name: per_page
+        description: 'Number of items per page (default: 50).'
+        required: false
+        example: 25
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+      page:
+        name: page
+        description: 'Page number.'
+        required: false
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        custom: []
+    cleanQueryParameters:
+      include: include=users
+      'filter[code]': VOUCHER2024
+      'filter[memo]': Promocional
+      'filter[credits]': '100'
+      'filter[uses]': 10
+      per_page: 25
+      page: 1
     bodyParameters: []
     cleanBodyParameters: []
     fileParameters: []
@@ -180,10 +334,111 @@ endpoints:
           cache-control: 'no-cache, private'
           content-type: application/json
           x-ratelimit-limit: '60'
-          x-ratelimit-remaining: '54'
+          x-ratelimit-remaining: '44'
           access-control-allow-origin: '*'
         description: null
         custom: []
+    responseFields: []
+    auth:
+      - headers
+      - Authorization
+      - 'Bearer 6g43cv8PD1aE5beadkZfhV6'
+    controller: null
+    method: null
+    route: null
+    custom: []
+  -
+    httpMethods:
+      - PUT
+      - PATCH
+    uri: 'api/vouchers/{id}'
+    metadata:
+      groupName: 'Voucher Management'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update the specified voucher in the system.'
+      description: ''
+      authenticated: true
+      custom: []
+    headers:
+      Authorization: 'Bearer {YOUR_AUTH_KEY}'
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        name: id
+        description: 'The ID of the voucher.'
+        required: true
+        example: 4
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+    cleanUrlParameters:
+      id: 4
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      memo:
+        name: memo
+        description: 'Must not be greater than 191 characters.'
+        required: false
+        example: b
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+      uses:
+        name: uses
+        description: 'Must not be greater than 2147483647. Must be at least 1.'
+        required: true
+        example: 22
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      code:
+        name: code
+        description: 'Must contain only letters, numbers, dashes and underscores. Must be at least 4 characters. Must not be greater than 36 characters.'
+        required: true
+        example: g
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      credits:
+        name: credits
+        description: 'Must be at least 0. Must not be greater than 9223372036854775.'
+        required: true
+        example: 16
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        custom: []
+      expires_at:
+        name: expires_at
+        description: 'Must be a date after <code>now</code>. Must be a date before <code>10 years</code>.'
+        required: false
+        example: '2021-08-11'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        custom: []
+    cleanBodyParameters:
+      memo: b
+      uses: 22
+      code: g
+      credits: 16
+      expires_at: '2021-08-11'
+    fileParameters: []
+    responses: []
     responseFields: []
     auth:
       - headers
