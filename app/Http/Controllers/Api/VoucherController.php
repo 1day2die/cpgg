@@ -21,6 +21,14 @@ class VoucherController extends Controller
 
     /**
      * Show a list of vouchers.
+     * 
+     * @queryParam include string Comma-separated list of related resources to include. Example: users
+     * @queryParam filter[code] string Filter by voucher code. Example: VOUCHER2024
+     * @queryParam filter[memo] string Filter by voucher memo. Example: Promocional
+     * @queryParam filter[credits] numeric Filter by credits. Example: 100
+     * @queryParam filter[uses] integer Filter by number of uses. Example: 10
+     * @queryParam per_page integer Number of items per page (default: 50). Example: 25
+     * @queryParam page integer Page number. Example: 1
      *
      * @param Request $request
      * @return VoucherResource
@@ -53,6 +61,8 @@ class VoucherController extends Controller
     /**
      * Show the specified voucher.
      *
+     * @queryParam include string Comma-separated list of related resources to include. Example: users
+     * 
      * @param Request $request
      * @param  int  $voucher
      * @return VoucherResource

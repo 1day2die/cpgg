@@ -34,7 +34,7 @@ class UpdateUserRequest extends FormRequest
                 'min:' . MysqlLimits::SERVER_LIMIT_MIN,
                 'max:' . MysqlLimits::SERVER_LIMIT_MAX,
             ],
-            'role' => 'sometimes|integer|exists:roles,id',
+            'role_id' => 'sometimes|integer|exists:roles,id',
         ];
     }
 }

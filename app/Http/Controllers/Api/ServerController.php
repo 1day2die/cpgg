@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Http\Controllers\Controller;
 use Exception;
+use Spatie\QueryBuilder\AllowedFilter;
 
 /**
  * @group Server Management
@@ -20,6 +21,16 @@ class ServerController extends Controller
 
     /**
      * Show a list of servers.
+     * 
+     * @queryParam include string Comma-separated list of related resources to include. Example: product,user
+     * @queryParam filter[name] string Filter by server name. Example: My Server
+     * @queryParam filter[suspended] string Filter by suspended status. Example: 2023-01-01
+     * @queryParam filter[identifier] string Filter by server identifier. Example: server-123
+     * @queryParam filter[pterodactyl_id] string Filter by Pterodactyl ID. Example: 456
+     * @queryParam filter[user_id] string Filter by user ID. Example: 789
+     * @queryParam filter[product_id] string Filter by product ID. Example: 101112
+     * @queryParam per_page integer Number of items per page (default: 50). Example: 25
+     * @queryParam page integer Page number. Example: 1
      *
      * @param  Request  $request
      * @return ServerResource
@@ -28,7 +39,10 @@ class ServerController extends Controller
     {
         $servers = QueryBuilder::for(Server::class)
             ->allowedIncludes(self::ALLOWED_INCLUDES)
-            ->allowedFilters(self::ALLOWED_FILTERS)
+            ->allowedFilters([
+                AllowedFilter::exact('suspended')->nullable(),
+                ...self::ALLOWED_FILTERS
+            ])
             ->paginate($request->input('per_page') ?? 50);
 
         return ServerResource::collection($servers);
@@ -36,6 +50,8 @@ class ServerController extends Controller
 
     /**
      * Show the specified server.
+     * 
+     * @queryParam include string Comma-separated list of related resources to include. Example: product,user
      *
      * @param  Request  $request
      * @param  string  $serverId

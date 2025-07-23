@@ -51,7 +51,7 @@ class CreateUserRequest extends FormRequest
                 'min:' . MysqlLimits::SERVER_LIMIT_MIN,
                 'max:' . MysqlLimits::SERVER_LIMIT_MAX,
             ],
-            'role' => 'required|integer|exists:roles,id',
+            'role_id' => 'required|integer|exists:roles,id',
             'referral_code' => 'sometimes|nullable|string|exists:users,referral_code',
         ];
     }

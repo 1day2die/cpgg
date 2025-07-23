@@ -24,7 +24,7 @@ class UpdateVoucherRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'memo' => 'nullable|string|max:191',
+            'memo' => 'sometimes|nullable|string|max:191',
             'uses' => 'required|numeric|max:2147483647|min:1',
             'code' => ['required', 'string', 'alpha_dash', 'min:4', 'max:36',
                 Rule::unique('vouchers')->ignore($this->route('voucher')?->id), // Make the voucher nullable because stribe don't support unique validation rule.
@@ -33,7 +33,25 @@ class UpdateVoucherRequest extends FormRequest
                 'min:' . MysqlLimits::CREDITS_MIN,
                 'max:' . MysqlLimits::CREDITS_MAX,
             ],
-            'expires_at' => 'nullable|multiple_date_format:d-m-Y H:i:s,d-m-Y|after:now|before:10 years',
+            'expires_at' => 'sometimes|nullable|multiple_date_format:d-m-Y H:i:s,d-m-Y|after:now|before:10 years',
+        ];
+    }
+
+    /**
+     * Get the body parameters for the request documentation.
+     * Document only the “code” parameter due to the unique rule.
+     * 
+     * @see https://github.com/knuckleswtf/scribe/pull/1011
+     *
+     * @return void
+     */
+    public function bodyParameters()
+    {
+        return [
+            'code' => [
+                'description' => 'The unique code of the voucher.',
+                'example' => 'VOUCHER1234',
+            ],
         ];
     }
 }

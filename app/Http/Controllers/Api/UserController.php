@@ -49,6 +49,15 @@ class UserController extends Controller
 
     /**
      * Show a list of users.
+     * 
+     * @queryParam include string Comma-separated list of related resources to include. Example: servers.product,notifications,payments,vouchers.users,roles.permissions,discordUser
+     * @queryParam filter[name] string Filter by user name. Example: John Doe
+     * @queryParam filter[server_limit] integer Filter by server limit. Example: 5
+     * @queryParam filter[email] string Filter by user email. Example: john@example.com
+     * @queryParam filter[pterodactyl_id] string Filter by Pterodactyl ID. Example: 456
+     * @queryParam filter[suspended] boolean Filter by suspended status. Example: true
+     * @queryParam per_page integer Number of items per page (default: 50). Example: 25
+     * @queryParam page integer Page number. Example: 1
      *
      * @param  Request  $request
      * @return UserResource
@@ -65,6 +74,8 @@ class UserController extends Controller
 
     /**
      * Show the specified user.
+     * 
+     * @queryParam include string Comma-separated list of related resources to include. Example: servers.product,notifications,payments,vouchers.users,roles.permissions,discordUser
      *
      * @param  Request  $request
      * @param  int  $userId
@@ -114,10 +125,9 @@ class UserController extends Controller
                 ]);
             }
 
-            if (isset($data['role'])) {
-                $collectedRoles = collect($data['role'])->map(fn($val) => (int)$val);
-                $user->syncRoles($collectedRoles);
-                unset($data['role']);
+            if (isset($data['role_id'])) {
+                $user->syncRoles([$data['role_id']]);
+                unset($data['role_id']);
             }
 
             $dataPayload = array_filter([
@@ -267,21 +277,18 @@ class UserController extends Controller
                 ]);
             }
 
-            $role = $data['role'];
-            unset($data['role']);
+            $role_id = $data['role_id'];
+            unset($data['role_id']);
 
             $user = User::create([
                 ...$data,
-                'credits' => $data['credits'] ?? $userSettings->initial_credits,
+                'credits' => isset($data['credits']) ? $this->currencyHelper->prepareForDatabase($data['credits']) : $userSettings->initial_credits,
                 'server_limit' => $data['server_limit'] ?? $userSettings->initial_server_limit,
                 'referral_code' => $this->createReferralCode(),
                 'pterodactyl_id' => $response->json()['attributes']['id'],
             ]);
 
-            if($role) {
-                $collectedRoles = collect($role)->map(fn($val)=>(int)$val);
-                $user->syncRoles($collectedRoles);
-            }
+            $user->syncRoles([$role_id]);
 
             $this->incrementReferralUserCredits($user, $data);
 
