@@ -72,7 +72,8 @@ return [
         // Middleware to attach to the docs endpoint (if `add_routes` is true).
         'middleware' => [
             'auth',
-            'web'
+            'web',
+            'canAccessDocsPage'
         ],
     ],
 
