@@ -90,6 +90,9 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
+        "post-install-cmd": [
+            "@php artisan scribe:generate --ansi --force --quiet"
+        ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ]
