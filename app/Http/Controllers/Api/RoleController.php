@@ -9,6 +9,7 @@ use App\Models\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Roles\CreateRoleRequest;
 use App\Http\Requests\Api\Roles\UpdateRoleRequest;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -70,6 +71,8 @@ class RoleController extends Controller
      * @param  Request  $request
      * @param  int  $roleId
      * @return RoleResource
+     * 
+     * @throws ModelNotFoundException
      */
     public function show(Request $request, int $roleId)
     {
@@ -87,6 +90,8 @@ class RoleController extends Controller
      * @param  Request  $request
      * @param  Role  $role
      * @return RoleResource
+     * 
+     * @throws ModelNotFoundException
      */
     public function update(UpdateRoleRequest $request, Role $role)
     {
@@ -109,6 +114,8 @@ class RoleController extends Controller
      * @param  Request  $request
      * @param  Role  $role
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * 
+     * @throws ModelNotFoundException
      */
     public function destroy(Request $request, Role $role)
     {
