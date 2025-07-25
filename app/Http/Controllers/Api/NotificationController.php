@@ -153,7 +153,7 @@ class NotificationController extends Controller
     }
 
     /**
-     * Delete all notifications from an user
+     * Delete all notifications from an user.
      *
      * @param  Request  $request
      * @param  User  $user
@@ -161,7 +161,7 @@ class NotificationController extends Controller
      * 
      * @throws ModelNotFoundException
      */
-    public function delete(Request $request, User $user)
+    public function destroyAll(Request $request, User $user)
     {
         $count = $user->notifications()->delete();
 
@@ -183,7 +183,7 @@ class NotificationController extends Controller
      * 
      * @throws ModelNotFoundException
      */
-    public function deleteOne(Request $request, User $user, ModelNotification $notification)
+    public function destroyOne(Request $request, User $user, ModelNotification $notification)
     {
         $notification->delete();
 
