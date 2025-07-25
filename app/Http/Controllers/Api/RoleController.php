@@ -104,7 +104,7 @@ class RoleController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified role from the system.
      *
      * @param  Request  $request
      * @param  Role  $role
