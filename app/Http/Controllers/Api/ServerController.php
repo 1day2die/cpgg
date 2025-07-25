@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Server;
 use App\Http\Resources\ServerResource;
+use App\Http\Controllers\Controller;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
-use App\Http\Controllers\Controller;
-use Exception;
 use Spatie\QueryBuilder\AllowedFilter;
+use Exception;
 
 /**
  * @group Server Management
@@ -56,6 +57,8 @@ class ServerController extends Controller
      * @param  Request  $request
      * @param  string  $serverId
      * @return ServerResource
+     * 
+     * @throws ModelNotFoundException
      */
     public function show(Request $request, string $serverId)
     {
@@ -73,6 +76,8 @@ class ServerController extends Controller
      * @param  Request  $request
      * @param  Server  $server
      * @return \Illuminate\Http\Response
+     * 
+     * @throws ModelNotFoundException
      */
     public function destroy(Request $request, Server $server)
     {
@@ -87,6 +92,8 @@ class ServerController extends Controller
      * @param  Request  $request
      * @param  Server  $server
      * @return ServerResource|JsonResponse
+     * 
+     * @throws ModelNotFoundException
      */
     public function suspend(Request $request, Server $server)
     {
@@ -105,6 +112,8 @@ class ServerController extends Controller
      * @param  Request  $request
      * @param  Server  $server
      * @return ServerResource|JsonResponse
+     * 
+     * @throws ModelNotFoundException
      */
     public function unSuspend(Request $request, Server $server)
     {

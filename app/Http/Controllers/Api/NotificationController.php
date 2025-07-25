@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 
 /**
@@ -30,6 +31,8 @@ class NotificationController extends Controller
      * @param  Request  $request
      * @param  User  $user
      * @return NotificationResource
+     * 
+     * @throws ModelNotFoundException
      */
     public function index(Request $request, User $user)
     {
@@ -45,6 +48,8 @@ class NotificationController extends Controller
      * @param  User  $user
      * @param  ModelNotification  $notification
      * @return NotificationResource
+     * 
+     * @throws ModelNotFoundException
      */
     public function view(Request $request, User $user, ModelNotification $notification)
     {
@@ -153,6 +158,8 @@ class NotificationController extends Controller
      * @param  Request  $request
      * @param  User  $user
      * @return JsonResponse
+     * 
+     * @throws ModelNotFoundException
      */
     public function delete(Request $request, User $user)
     {
@@ -173,6 +180,8 @@ class NotificationController extends Controller
      * @param  User  $user
      * @param  ModelNotification  $notification
      * @return \Illuminate\Http\Response
+     * 
+     * @throws ModelNotFoundException
      */
     public function deleteOne(Request $request, User $user, ModelNotification $notification)
     {
