@@ -44,6 +44,15 @@ class ProductResource extends JsonResource
             'billing_period' => $this->billing_period,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
+            'nodes_count' => $this->whenCounted('nodes'),
+            'nodes_exists' => $this->whenExistsLoaded('nodes'),
+            'nodes' => NodeResource::collection($this->whenLoaded('nodes')),
+            'eggs_count' => $this->whenCounted('eggs'),
+            'eggs_exists' => $this->whenExistsLoaded('eggs'),
+            'eggs' => EggResource::collection($this->whenLoaded('eggs')),
+            'servers_count' => $this->whenCounted('servers'),
+            'servers_exists' => $this->whenExistsLoaded('servers'),
+            'servers' => ServerResource::collection($this->whenLoaded('servers')),
         ];
     }
 }
