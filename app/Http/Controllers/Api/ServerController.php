@@ -112,7 +112,7 @@ class ServerController extends Controller
 
             event(new ServerCreatedEvent($user, $server));
 
-            return ServerResource::make($server);
+            return ServerResource::make($server->fresh());
         } catch (Exception $e) {
             return response()->json([
                 'message' => $e->getMessage()
