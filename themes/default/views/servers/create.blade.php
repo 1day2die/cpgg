@@ -653,8 +653,13 @@
                     },
                   }).then((result) => {
                     if (result.isConfirmed && result.value.success) {
-                      document.getElementById('egg_variables').value = JSON.stringify(result.value.variables);
-                      document.getElementById('serverForm').submit();
+                        let variables = result.value.variables.reduce((acc, variable) => {
+                          acc[variable.env_variable] = variable.filled_value;
+                          return acc;
+                        }, {});
+
+                        document.getElementById('egg_variables').value = JSON.stringify(variables);
+                        document.getElementById('serverForm').submit();
                     }
                   });
                 }
