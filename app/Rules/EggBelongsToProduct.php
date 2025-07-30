@@ -42,4 +42,16 @@ class EggBelongsToProduct implements DataAwareRule, ValidationRule
             $fail("The egg with ID {$value} does not belong to the product with ID {$this->data['product_id']}.");
         }
     }
+
+    /**
+     * Get the validation rules documentation.
+     *
+     * @return array<string, mixed>
+     */
+    public static function docs(): array
+    {
+        return [
+            'description' => 'The egg must belong to the specified product.',
+        ];
+    }
 }

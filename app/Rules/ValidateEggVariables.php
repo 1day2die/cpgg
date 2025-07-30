@@ -60,6 +60,18 @@ class ValidateEggVariables implements DataAwareRule, ValidationRule
     }
 
     /**
+     * Get the validation rules documentation.
+     *
+     * @return array<string, mixed>
+     */
+    public static function docs(): array
+    {
+        return [
+            'description' => 'Each egg has its own variable rules.',
+        ];
+    }
+
+    /**
      * Validate the rules for each environment variable.
      */
     private function validateVariableRules(array $envVar, $value, Closure $fail): void
