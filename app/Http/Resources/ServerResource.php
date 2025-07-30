@@ -27,7 +27,7 @@ class ServerResource extends JsonResource
             'canceled' => $this->canceled ? $this->canceled->toDateTimeString() : null,
             'created_at' => $this->created_at->toDateTimeString(),
             'updated_at' => $this->updated_at->toDateTimeString(),
-            'last_billed' => $this->last_billed,
+            'last_billed' => $this->last_billed->toDateTimeString(),
             'product_count' => $this->whenCounted('product'),
             'product_exists' => $this->whenExistsLoaded('product'),
             'product' => ProductResource::make($this->whenLoaded('product')),

@@ -443,6 +443,25 @@ class PterodactylClient
     }
 
     /**
+     * Update server details
+     *
+     * @param  Server  $server
+     * @param  array  $data
+     * @return Response
+     * 
+     * @throws HttpException
+     * @throws Exception
+     */
+    public function updateServerDetails(Server $server, array $data)
+    {
+        try {
+            return $this->application->patch("application/servers/{$server->pterodactyl_id}/details", $data);
+        } catch (Exception $e) {
+            throw self::getException($e->getMessage());
+        }
+    }
+
+    /**
      * Power Action Specific Server
      *
      * @param  Server  $server
@@ -495,15 +514,16 @@ class PterodactylClient
     private function getEnvironmentVariables(Egg $egg, $variables)
     {
         $environment = [];
-        $variables = json_decode($variables, true);
+        // Support for front-end and api variables format.
+        $variables = collect(is_string($variables) ? json_decode($variables, true) : $variables);
 
         foreach ($egg->environment as $envVariable) {
-            $matchedVariable = collect($variables)->firstWhere('env_variable', $envVariable['env_variable']);
-
-            $environment[$envVariable['env_variable']] = $matchedVariable
-                ? $matchedVariable['filled_value']
-                : $envVariable['default_value'];
+            if (!empty($envVariable['default_value'])) {
+                $environment[$envVariable['env_variable']] = $envVariable['default_value'];
+            }
         }
+
+        $environment = array_merge($environment, $variables->toArray());
 
         return $environment;
     }

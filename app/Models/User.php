@@ -91,7 +91,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'last_seen' => 'datetime',
-        'server_limit' => 'float',
+        'server_limit' => 'integer',
         'email_verified_reward' => 'boolean'
     ];
 
