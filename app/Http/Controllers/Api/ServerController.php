@@ -11,8 +11,10 @@ use App\Models\Server;
 use App\Http\Resources\ServerResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Servers\CreateServerRequest;
+use App\Http\Requests\Api\Servers\UpdateServerBuildRequest;
 use App\Http\Requests\Api\Servers\UpdateServerRequest;
 use App\Services\ServerCreationService;
+use App\Services\ServerUpgradeService;
 use App\Settings\PterodactylSettings;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -30,7 +32,8 @@ class ServerController extends Controller
     protected PterodactylClient $pterodactylClient;
 
     public function __construct(
-        protected ServerCreationService $serverCreationService
+        protected ServerCreationService $serverCreationService,
+        protected ServerUpgradeService $serverUpgradeService
     )
     {
         $this->pterodactylSettings = app(PterodactylSettings::class);
@@ -157,6 +160,31 @@ class ServerController extends Controller
             ]);
 
             return response()->json(['message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update the server build.
+     *
+     * @param  UpdateServerBuildRequest  $request
+     * @param  Server  $server
+     * @return ServerResource|JsonResponse
+     * 
+     * @throws ModelNotFoundException
+     */
+    public function updateBuild(UpdateServerBuildRequest $request, Server $server)
+    {
+        $data = $request->validated();
+
+        $user = User::findOrFail($data['user_id']);
+        $product = Product::findOrFail($data['product_id']);
+
+        try {
+            $server = $this->serverUpgradeService->handle($user, $product, $server);
+
+            return ServerResource::make($server->fresh());
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], $e->getCode() ?: 500);
         }
     }
 

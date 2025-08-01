@@ -407,6 +407,8 @@ class PterodactylClient
      * @param  Server  $server
      * @param  Product  $product
      * @return Response
+     * 
+     * @deprecated Use updateServerBuild instead.
      */
     public function updateServer(Server $server, Product $product)
     {
@@ -425,6 +427,43 @@ class PterodactylClient
                 'allocations' => $product->allocations,
             ],
         ]);
+    }
+
+    /**
+     * Update server build.
+     *
+     * @param  Server  $server
+     * @return Response
+     * 
+     * @throws Exception
+     */
+    public function updateServerBuild(string $pterodactylId, int $pterodactylAllocation, Product $product)
+    {
+        try {
+            $response = $this->application->patch("application/servers/{$pterodactylId}/build", [
+                'allocation' => $pterodactylAllocation,
+                'memory' => $product->memory,
+                'swap' => $product->swap,
+                'disk' => $product->disk,
+                'io' => $product->io,
+                'cpu' => $product->cpu,
+                'threads' => null,
+                'oom_disabled' => $product->oom_killer,
+                'feature_limits' => [
+                    'databases' => $product->databases,
+                    'backups' => $product->backups,
+                    'allocations' => $product->allocations,
+                ],
+            ]);
+
+            if ($response->failed()) {
+                throw self::getException('Server not found on Pterodactyl', 404);
+            }
+
+            return $response;
+        } catch (Exception $e) {
+            throw self::getException($e->getMessage());
+        }
     }
 
     /**

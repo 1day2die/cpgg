@@ -32,6 +32,7 @@ Route::middleware('api.token')->group(function () {
     Route::apiResource('servers', ServerController::class);
 
     Route::controller(ServerController::class)->name('servers.')->prefix('servers')->group(function () {
+        Route::patch('/{server}/build', 'updateBuild')->name('updateBuild');
         Route::patch('/{server}/suspend', 'suspend')->name('suspend');
         Route::patch('/{server}/unsuspend', 'unSuspend')->name('unsuspend');
     });
