@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BillingPriority;
 use App\Facades\Currency;
 use App\Models\Pterodactyl\Egg;
 use App\Models\Pterodactyl\Node;
@@ -36,6 +37,11 @@ class Product extends Model
     protected $appends = [
         'display_price',
         'display_minimum_credits',
+        'default_billing_priority_label',
+    ];
+
+    protected $casts = [
+        'default_billing_priority' => BillingPriority::class
     ];
 
     public static function boot()
@@ -140,6 +146,11 @@ class Product extends Model
     public function getDisplayMinimumCreditsAttribute()
     {
         return $this->minimum_credits ? Currency::formatForDisplay($this->minimum_credits) : null;
+    }
+
+    public function getDefaultBillingPriorityLabelAttribute()
+    {
+        return $this->default_billing_priority->label();
     }
 
     public function getWeeklyPrice()
