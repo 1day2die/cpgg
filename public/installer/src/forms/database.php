@@ -4,11 +4,10 @@ use DevCoder\DotEnv;
 
 (new DotEnv(dirname(__FILE__, 5) . '/.env'))->load();
 
+// Include installer functions to get $host variable and helper functions
+require_once dirname(__FILE__, 2) . '/functions/installer.php';
+
 mysqli_report(MYSQLI_REPORT_STRICT | MYSQLI_REPORT_ALL);
-
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-$host = $_SERVER['HTTP_HOST'];
-
 
 if (isset($_POST['checkDB'])) {
     $values = [

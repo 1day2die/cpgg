@@ -52,9 +52,6 @@ $stepConfig = [
     10 => ['view' => 'installation-complete', 'is_revertable' => false],
 ];
 
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-$host = $_SERVER['HTTP_HOST'];
-
 $_SESSION['last_installation_step'] = count($stepConfig);
 
 // Initialize or get the current step:
