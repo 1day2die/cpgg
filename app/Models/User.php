@@ -142,7 +142,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return Attribute::make(
             // We only convert when the user already exists, to avoid 2 conversions.
-            set: fn ($value) => $this->exists ? Currency::prepareForDatabase($value) : $value,
+            set: fn($value) => $this->exists ? Currency::prepareForDatabase($value) : $value,
         );
     }
 
@@ -194,6 +194,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Coupon::class, 'user_coupons');
     }
 
+    // tap into activity log to convert db value to display value
+    public function tapActivity(\Spatie\Activitylog\Models\Activity $activity, string $eventName)
+    {
+        if ($eventName === 'deleted' && isset($activity->properties['attributes']['credits'])) {
+            $activity->properties['attributes']['credits'] = \App\Facades\Currency::convertForDisplay($activity->properties['attributes']['credits']);
+        }
+    }
+
     /**
      * @return HasOne
      */
@@ -218,7 +226,7 @@ class User extends Authenticatable implements MustVerifyEmail
             if (!$executed) {
                 return redirect()->back()->with('error', 'Too many requests. Try again in ' . RateLimiter::availableIn('verify-mail:' . $this->id) . ' seconds.');
             }
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             Log::error($exception->getMessage());
             return redirect()->back()->with('error', __("Something went wrong. Please try again later!"));
         }
