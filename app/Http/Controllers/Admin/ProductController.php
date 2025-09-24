@@ -60,10 +60,10 @@ class ProductController extends Controller
     public function clone(Product $product, GeneralSettings $general_settings)
     {
         $this->checkPermission(self::WRITE_PERMISSION);
-        
+
         return view('admin.products.create', [
             'product' => $product,
-            'credits_display_name' =>  $general_settings->credits_display_name,
+            'credits_display_name' => $general_settings->credits_display_name,
             'locations' => Location::with('nodes')->get(),
             'nests' => Nest::with('eggs')->get(),
         ]);
@@ -80,11 +80,11 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|max:30',
             'price' => 'required|numeric|max:1000000|min:0',
-            'memory' => 'required|numeric|max:1000000|min:5',
+            'memory' => 'required|numeric|max:1000000|min:0',
             'cpu' => 'required|numeric|max:1000000|min:0',
             'swap' => 'required|numeric|max:1000000|min:0',
             'description' => 'required|string|max:191',
-            'disk' => 'required|numeric|max:1000000|min:5',
+            'disk' => 'required|numeric|max:1000000|min:0',
             'minimum_credits' => 'nullable|numeric|max:1000000',
             'io' => 'required|numeric|max:1000000|min:0',
             'serverlimit' => 'required|numeric|max:1000000|min:0',
@@ -100,8 +100,8 @@ class ProductController extends Controller
         ]);
 
 
-        $disabled = ! is_null($request->input('disabled'));
-        $oomkiller = ! is_null($request->input('oom_killer'));
+        $disabled = !is_null($request->input('disabled'));
+        $oomkiller = !is_null($request->input('oom_killer'));
         $product = Product::create(array_merge($request->all(), ['disabled' => $disabled, 'oom_killer' => $oomkiller]));
 
         //link nodes and eggs
@@ -119,7 +119,7 @@ class ProductController extends Controller
      */
     public function show(Product $product, UserSettings $user_settings, GeneralSettings $general_settings)
     {
-        $this->checkAnyPermission([self::READ_PERMISSION,self::WRITE_PERMISSION]);
+        $this->checkAnyPermission([self::READ_PERMISSION, self::WRITE_PERMISSION]);
 
         return view('admin.products.show', [
             'product' => $product,
@@ -158,11 +158,11 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|max:30',
             'price' => 'required|numeric|max:1000000|min:0',
-            'memory' => 'required|numeric|max:1000000|min:5',
+            'memory' => 'required|numeric|max:1000000|min:0',
             'cpu' => 'required|numeric|max:1000000|min:0',
             'swap' => 'required|numeric|max:1000000|min:0',
             'description' => 'required|string|max:191',
-            'disk' => 'required|numeric|max:1000000|min:5',
+            'disk' => 'required|numeric|max:1000000|min:0',
             'io' => 'required|numeric|max:1000000|min:0',
             'minimum_credits' => 'nullable|numeric|max:1000000',
             'databases' => 'required|numeric|max:1000000|min:0',
@@ -177,8 +177,8 @@ class ProductController extends Controller
             'default_billing_priority' => ['required', new Enum(BillingPriority::class)]
         ]);
 
-        $disabled = ! is_null($request->input('disabled'));
-        $oomkiller = ! is_null($request->input('oom_killer'));
+        $disabled = !is_null($request->input('disabled'));
+        $oomkiller = !is_null($request->input('oom_killer'));
         $product->update(array_merge($request->all(), ['disabled' => $disabled, 'oom_killer' => $oomkiller]));
 
         //link nodes and eggs
@@ -199,7 +199,7 @@ class ProductController extends Controller
     {
         $this->checkPermission(self::WRITE_PERMISSION);
 
-        $product->update(['disabled' => ! $product->disabled]);
+        $product->update(['disabled' => !$product->disabled]);
 
         return redirect()->route('admin.products.index')->with('success', 'Product has been updated!');
     }
@@ -236,14 +236,14 @@ class ProductController extends Controller
         return datatables($query)
             ->addColumn('actions', function (Product $product) {
                 return '
-                            <a data-content="'.__('Show').'" data-toggle="popover" data-trigger="hover" data-placement="top" href="'.route('admin.products.show', $product->id).'" class="mr-1 text-white btn btn-sm btn-warning"><i class="fas fa-eye"></i></a>
-                            <a data-content="'.__('Clone').'" data-toggle="popover" data-trigger="hover" data-placement="top" href="'.route('admin.products.clone', $product->id).'" class="mr-1 text-white btn btn-sm btn-primary"><i class="fas fa-clone"></i></a>
-                            <a data-content="'.__('Edit').'" data-toggle="popover" data-trigger="hover" data-placement="top" href="'.route('admin.products.edit', $product->id).'" class="mr-1 btn btn-sm btn-info"><i class="fas fa-pen"></i></a>
+                            <a data-content="' . __('Show') . '" data-toggle="popover" data-trigger="hover" data-placement="top" href="' . route('admin.products.show', $product->id) . '" class="mr-1 text-white btn btn-sm btn-warning"><i class="fas fa-eye"></i></a>
+                            <a data-content="' . __('Clone') . '" data-toggle="popover" data-trigger="hover" data-placement="top" href="' . route('admin.products.clone', $product->id) . '" class="mr-1 text-white btn btn-sm btn-primary"><i class="fas fa-clone"></i></a>
+                            <a data-content="' . __('Edit') . '" data-toggle="popover" data-trigger="hover" data-placement="top" href="' . route('admin.products.edit', $product->id) . '" class="mr-1 btn btn-sm btn-info"><i class="fas fa-pen"></i></a>
 
-                           <form class="d-inline" onsubmit="return submitResult();" method="post" action="'.route('admin.products.destroy', $product->id).'">
-                            '.csrf_field().'
-                            '.method_field('DELETE').'
-                           <button data-content="'.__('Delete').'" data-toggle="popover" data-trigger="hover" data-placement="top" class="mr-1 btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                           <form class="d-inline" onsubmit="return submitResult();" method="post" action="' . route('admin.products.destroy', $product->id) . '">
+                            ' . csrf_field() . '
+                            ' . method_field('DELETE') . '
+                           <button data-content="' . __('Delete') . '" data-toggle="popover" data-trigger="hover" data-placement="top" class="mr-1 btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                        </form>
                 ';
             })
@@ -261,12 +261,12 @@ class ProductController extends Controller
                 $checked = $product->disabled == false ? 'checked' : '';
 
                 return '
-                    <form class="d-inline" onsubmit="return submitResult();" method="post" action="'.route('admin.products.disable', $product->id).'">
-                        '.csrf_field().'
-                        '.method_field('PATCH').'
+                    <form class="d-inline" onsubmit="return submitResult();" method="post" action="' . route('admin.products.disable', $product->id) . '">
+                        ' . csrf_field() . '
+                        ' . method_field('PATCH') . '
                         <div class="custom-control custom-switch">
-                        <input '.$checked.' name="disabled" onchange="this.form.submit()" type="checkbox" class="custom-control-input" id="switch'.$product->id.'">
-                        <label class="custom-control-label" for="switch'.$product->id.'"></label>
+                        <input ' . $checked . ' name="disabled" onchange="this.form.submit()" type="checkbox" class="custom-control-input" id="switch' . $product->id . '">
+                        <label class="custom-control-label" for="switch' . $product->id . '"></label>
                         </div>
                     </form>
                 ';
@@ -275,10 +275,22 @@ class ProductController extends Controller
                 return $currencyHelper->formatForDisplay($product->price);
             })
             ->editColumn('minimum_credits', function (Product $product, UserSettings $user_settings, CurrencyHelper $currencyHelper) {
-                return $product->minimum_credits ? $currencyHelper->formatForDisplay($product->minimum_credits) : $currencyHelper->formatForDisplay($user_settings->min_credits_to_make_server);
+                return $product->minimum_credits ? $currencyHelper->formatForDisplay($product->minimum_credits) : $user_settings->min_credits_to_make_server;
             })
             ->editColumn('serverlimit', function (Product $product) {
                 return $product->serverlimit == 0 ? "∞" : $product->serverlimit;
+            })
+            ->editColumn('memory', function (Product $product) {
+                return $product->memory == 0 ? "∞" : $product->memory;
+            })
+            ->editColumn('cpu', function (Product $product) {
+                return $product->cpu == 0 ? "∞" : $product->cpu;
+            })
+            ->editColumn('swap', function (Product $product) {
+                return $product->swap == 0 ? "∞" : $product->swap;
+            })
+            ->editColumn('disk', function (Product $product) {
+                return $product->disk == 0 ? "∞" : $product->disk;
             })
             ->editColumn('oom_killer', function (Product $product) {
                 return $product->oom_killer ? __("enabled") : __("disabled");

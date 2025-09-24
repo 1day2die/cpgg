@@ -185,9 +185,10 @@
                                     <div class="col-lg-6">
 										<div class="form-group">
 											<label for="cpu">{{ __('Cpu') }}</label>
-											<input value="{{ $product->cpu ?? old('cpu') }}" id="cpu" name="cpu"
-												type="number" class="form-control @error('cpu') is-invalid @enderror"
-												required="required">
+                                            <input value="{{ $product->cpu ?? old('cpu') }}" id="cpu" name="cpu"
+                                                type="number" min="0" class="form-control @error('cpu') is-invalid @enderror"
+                                                required="required">
+                                            <div class="text-muted small">{{ __('Set to 0 for ∞') }}</div>
 											@error('cpu')
 												<div class="invalid-feedback">
 													{{ $message }}
@@ -198,10 +199,11 @@
                                     <div class="col-lg-6">
 										<div class="form-group">
 											<label for="disk">{{ __('Disk') }}</label>
-											<input value="{{ $product->disk ?? (old('disk') ?? 1000) }}" id="disk"
-												name="disk" type="number"
-												class="form-control @error('disk') is-invalid @enderror"
-												required="required">
+                                            <input value="{{ $product->disk ?? (old('disk') ?? 1000) }}" id="disk"
+                                                name="disk" type="number" min="0"
+                                                class="form-control @error('disk') is-invalid @enderror"
+                                                required="required">
+                                            <div class="text-muted small">{{ __('Set to 0 for ∞') }}</div>
 											@error('disk')
 												<div class="invalid-feedback">
 													{{ $message }}
@@ -214,10 +216,11 @@
                                     <div class="col-lg-6">
 										<div class="form-group">
 											<label for="memory">{{ __('Memory') }}</label>
-											<input value="{{ $product->memory ?? old('memory') }}" id="memory"
-												name="memory" type="number"
-												class="form-control @error('memory') is-invalid @enderror"
-												required="required">
+                                            <input value="{{ $product->memory ?? old('memory') }}" id="memory"
+                                                name="memory" type="number" min="0"
+                                                class="form-control @error('memory') is-invalid @enderror"
+                                                required="required">
+                                            <div class="text-muted small">{{ __('Set to 0 for ∞') }}</div>
 											@error('memory')
 												<div class="invalid-feedback">
 													{{ $message }}

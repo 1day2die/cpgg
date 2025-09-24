@@ -56,7 +56,7 @@
                           <div class="numbers">
                             <p class="mb-0 text-sm text-uppercase font-weight-bold">{{ __('CPU') }}</p>
                             <h5 class="font-weight-bolder">
-                              <span class="text-sm text-success font-weight-bolder">@if($server->product->cpu == 0){{ __('Unlimited') }} @else {{$server->product->cpu}} % @endif</span>
+                              <span class="text-sm text-success font-weight-bolder">@if($server->product->cpu == 0){{ '∞' }} @else {{$server->product->cpu}} % @endif</span>
                             </h5>
                           </div>
                         </div>
@@ -77,7 +77,7 @@
                           <div class="numbers">
                             <p class="mb-0 text-sm text-uppercase font-weight-bold">{{ __('MEMORY') }}</p>
                             <h5 class="font-weight-bolder">
-                              <span class="text-sm text-success font-weight-bolder">@if($server->product->memory == 0){{ __('Unlimited') }} @else {{$server->product->memory}}MB @endif</span>
+                              <span class="text-sm text-success font-weight-bolder">@if($server->product->memory == 0){{ '∞' }} @else {{$server->product->memory}}MB @endif</span>
                             </h5>
                           </div>
                         </div>
@@ -98,7 +98,7 @@
                           <div class="numbers">
                             <p class="mb-0 text-sm text-uppercase font-weight-bold">{{ __('STORAGE') }}</p>
                             <h5 class="font-weight-bolder">
-                              <span class="text-sm text-success font-weight-bolder">@if($server->product->disk == 0){{ __('Unlimited') }} @else {{$server->product->disk}}MB @endif</span>
+                              <span class="text-sm text-success font-weight-bolder">@if($server->product->disk == 0){{ '∞' }} @else {{$server->product->disk}}MB @endif</span>
                             </h5>
                           </div>
                         </div>

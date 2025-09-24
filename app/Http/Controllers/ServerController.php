@@ -112,7 +112,8 @@ class ServerController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validationResult = $this->validateServerCreation($request);
-        if ($validationResult) return $validationResult;
+        if ($validationResult)
+            return $validationResult;
 
         $request->validate([
             'name' => 'required|max:191',
@@ -212,7 +213,8 @@ class ServerController extends Controller
 
         foreach ($servers as $server) {
             $serverInfo = $this->pterodactyl->getServerAttributes($server->pterodactyl_id);
-            if (!$serverInfo) continue;
+            if (!$serverInfo)
+                continue;
 
             $this->updateServerInfo($server, $serverInfo);
         }
@@ -260,7 +262,8 @@ class ServerController extends Controller
         $egg = $product->eggs()->findOrFail($request->input('egg'));
         $node = $this->findAvailableNode($request->input('location'), $product);
 
-        if (!$node) return null;
+        if (!$node)
+            return null;
 
         $server = $request->user()->servers()->create([
             'name' => $request->input('name'),
@@ -306,7 +309,8 @@ class ServerController extends Controller
         $user->decrement('credits', $server->product->price);
 
         try {
-            if ($this->discordSettings->role_for_active_clients &&
+            if (
+                $this->discordSettings->role_for_active_clients &&
                 $user->discordUser &&
                 $user->servers->count() >= 1
             ) {
@@ -425,8 +429,10 @@ class ServerController extends Controller
                 $maxMemory = ($pteroNode['memory'] * ($pteroNode['memory_overallocate'] + 100) / 100);
                 $maxDisk = ($pteroNode['disk'] * ($pteroNode['disk_overallocate'] + 100) / 100);
 
-                if ($memoryDiff > $maxMemory - $pteroNode['allocated_resources']['memory'] ||
-                    $diskDiff > $maxDisk - $pteroNode['allocated_resources']['disk']) {
+                if (
+                    $memoryDiff > $maxMemory - $pteroNode['allocated_resources']['memory'] ||
+                    $diskDiff > $maxDisk - $pteroNode['allocated_resources']['disk']
+                ) {
                     $product->doesNotFit = true;
                 }
 
