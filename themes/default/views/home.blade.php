@@ -206,7 +206,7 @@
                                         <tbody>
                                             <tr>
                                                 @if(in_array($referral_settings->mode, ["sign-up","both"]))<td>
-                                                    {{ Currency::formatForDisplay($referral_settings->reward) }} {{ $general_settings->credits_display_name }}</td>
+                                                    {{ $referral_settings->reward }} {{ $general_settings->credits_display_name }}</td>
                                                 @endif
                                                 @if(in_array($referral_settings->mode, ["commission","both"]))<td>{{
                                                     $referral_settings->percentage }}%</td> @endif
