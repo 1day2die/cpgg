@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Facades\Currency;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\ReferralNotification;
@@ -137,7 +138,7 @@ class RegisterController extends Controller
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'credits' => $this->initial_credits,
+            'credits' => Currency::prepareForDatabase($this->initial_credits),
             'server_limit' => $this->initial_server_limit,
             'password' => Hash::make($data['password']),
             'referral_code' => $this->createReferralCode(),
