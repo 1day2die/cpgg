@@ -174,7 +174,7 @@
                                 <i
                                   data-toggle="popover"
                                   data-trigger="hover"
-                                  data-content="{{__('The maximum number of times the coupon can be used.')}}"
+                                  data-content="{{__('The maximum number of times the coupon can be used. Set to -1 for unlimited uses.')}}"
                                   class="fas fa-info-circle">
                                 </i>
                               </label>
@@ -183,11 +183,11 @@
                                 id="max_uses"
                                 type="number"
                                 step="any"
-                                min="1"
-                                max="100"
+                                min="-1"
                                 class="form-control @error('max_uses') is-invalid @enderror"
                                 value="{{ $coupon->max_uses }}"
                               >
+                              <small class="form-text text-muted">{{__('Set to -1 for unlimited uses.')}}</small>
                               @error('max_uses')
                                 <div class="text-danger">
                                   {{ $message }}

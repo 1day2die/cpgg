@@ -55,7 +55,7 @@ class Coupon extends Model
     protected function value(): Attribute
     {
         return Attribute::make(
-            set: fn ($value) => $this->type == 'amount' ? Currency::prepareForDatabase($value) : $value
+            set: fn($value) => $this->type == 'amount' ? Currency::prepareForDatabase($value) : $value
         );
     }
 
@@ -76,7 +76,10 @@ class Coupon extends Model
      */
     public function getStatus()
     {
-        if ($this->uses >= $this->max_uses) {
+        // Unlimited uses if max_uses is -1
+        if ($this->max_uses == -1) {
+            // Unlimited coupons are always valid unless expired
+        } elseif ($this->uses >= $this->max_uses) {
             return 'USES_LIMIT_REACHED';
         }
 
@@ -99,8 +102,11 @@ class Coupon extends Model
     public function isMaxUsesReached($user): bool
     {
         $coupon_settings = new CouponSettings;
+        // Unlimited uses if max_uses is -1
+        if ($this->max_uses === -1) {
+            return false;
+        }
         $coupon_uses = $user->coupons()->where('id', $this->id)->count();
-
         return $coupon_uses >= $coupon_settings->max_uses_per_user;
     }
 
