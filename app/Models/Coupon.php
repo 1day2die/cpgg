@@ -34,8 +34,7 @@ class Coupon extends Model
         'value',
         'uses',
         'max_uses',
-        'expires_at',
-        'max_uses_per_user'
+        'expires_at'
     ];
 
     /**
@@ -46,7 +45,6 @@ class Coupon extends Model
         'uses' => 'integer',
         'max_uses' => 'integer',
         'expires_at' => 'timestamp',
-        'max_uses_per_user' => 'integer',
     ];
 
     /**
@@ -84,7 +82,7 @@ class Coupon extends Model
 
         if (!is_null($this->expires_at)) {
             if ($this->expires_at <= Carbon::now(config('app.timezone'))->timestamp) {
-            return __('EXPIRED');
+                return __('EXPIRED');
             }
         }
 
@@ -106,7 +104,7 @@ class Coupon extends Model
             return false;
         }
         $coupon_uses = $user->coupons()->where('id', $this->id)->count();
-        $limit = $this->max_uses_per_user ?? $coupon_settings->max_uses_per_user;
+        $limit = $coupon_settings->max_uses_per_user;
         if ($limit === null) {
             return false; // No limit set anywhere
         }

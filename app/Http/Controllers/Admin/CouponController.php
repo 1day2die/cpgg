@@ -65,7 +65,6 @@ class CouponController extends Controller
         }
 
         $request->validate($rules);
-        $normalizedPerUser = $this->normalizeMaxUsesPerUser($request->input('max_uses_per_user'));
 
         if (array_key_exists('range_codes', $rules)) {
             $data = [];
@@ -78,7 +77,7 @@ class CouponController extends Controller
                     'type' => $request->input('type'),
                     'value' => $request->input('value'),
                     'max_uses' => $request->input('max_uses'),
-                    'max_uses_per_user' => $normalizedPerUser,
+                    // per-coupon max_uses_per_user removed; rely on global setting
                     'expires_at' => $request->input('expires_at'),
                     'created_at' => Carbon::now(), // Does not fill in by itself when using the 'insert' method.
                     'updated_at' => Carbon::now()
@@ -87,7 +86,6 @@ class CouponController extends Controller
             Coupon::insert($data);
         } else {
             $data = $request->except('_token');
-            $data['max_uses_per_user'] = $normalizedPerUser;
 
             Coupon::create($data);
         }
@@ -146,7 +144,6 @@ class CouponController extends Controller
 
         $request->validate($rules);
         $data = $request->except('_token');
-        $data['max_uses_per_user'] = $this->normalizeMaxUsesPerUser($request->input('max_uses_per_user'));
         $coupon->update($data);
 
         return redirect()->route('admin.coupons.index')->with('success', __('coupon has been updated!'));
@@ -185,21 +182,7 @@ class CouponController extends Controller
             "value" => "required|numeric|between:0,100",
             "expires_at" => "nullable|date|after:" . Carbon::now()->format(Coupon::formatDate())
         ];
-        $rules['max_uses_per_user'] = [
-            'nullable',
-            'integer',
-            function ($attribute, $value, $fail) {
-                if (is_null($value)) {
-                    return; // fallback to global setting
-                }
-                if ($value != -1 && (!is_numeric($value) || $value < 1 || $value > 99999999999999999999)) {
-                    $fail(__('Max uses per user must be -1 for unlimited or a positive integer.'));
-                }
-                if ($value != -1 && strlen((string) $value) > 100) {
-                    $fail(__('Max uses per user must be at most 100 digits.'));
-                }
-            }
-        ];
+        // per-coupon max_uses_per_user validation removed; use global CouponSettings
 
         if ($coupon_code) {
             $rules['code'] = "required|string|min:4";
@@ -269,13 +252,7 @@ class CouponController extends Controller
             ->editColumn('code', function (Coupon $coupon) {
                 return "<code>{$coupon->code}</code>";
             })
-            ->editColumn('max_uses_per_user', function (Coupon $coupon) {
-                if (is_null($coupon->max_uses_per_user)) {
-                    return __('Global');
-                }
-
-                return $coupon->max_uses_per_user == -1 ? 'Unlimited' : $coupon->max_uses_per_user;
-            })
+            // per-coupon max_uses_per_user column removed from listing; show global behavior instead if needed
             ->orderColumn('status', 'derived_status $1')
             ->rawColumns(['actions', 'code', 'status'])
             ->make();
@@ -289,14 +266,7 @@ class CouponController extends Controller
      */
     private function normalizeMaxUsesPerUser($value)
     {
-        if (is_null($value) || $value === '') {
-            return null;
-        }
-
-        if (is_numeric($value)) {
-            return (int) $value;
-        }
-
+        // method removed as per-coupon max_uses_per_user was removed
         return null;
     }
 }

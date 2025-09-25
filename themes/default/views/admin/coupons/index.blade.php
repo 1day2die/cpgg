@@ -46,7 +46,6 @@
                 <th>{{__('Code')}}</th>
                 <th>{{__('Value')}}</th>
                 <th>{{__('Used / Max Uses')}}</th>
-                <th>{{__('Max Uses Per User')}}</th>
                 <th>{{__('Expires')}}</th>
                 <th>{{__('Created At')}}</th>
                 <th>{{__('Actions')}}</th>
@@ -70,7 +69,7 @@
       return confirm("{{__('Are you sure you wish to delete?')}}") !== false;
     }
 
-    $(document).ready(function() {
+    $(document).ready(function () {
       $('#datatable').DataTable({
         language: {
           url: '//cdn.datatables.net/plug-ins/1.11.3/i18n/{{ $locale_datatables }}.json'
@@ -80,16 +79,15 @@
         stateSave: true,
         ajax: "{{route('admin.coupons.datatable')}}",
         columns: [
-          {data: 'status'},
-          {data: 'code'},
-          {data: 'value'},
-          {data: 'uses', sortable: false},
-          {data: 'max_uses_per_user', sortable: false},
-          {data: 'expires_at'},
-          {data: 'created_at'},
-          {data: 'actions', sortable: false},
+          { data: 'status' },
+          { data: 'code' },
+          { data: 'value' },
+          { data: 'uses', sortable: false },
+          { data: 'expires_at' },
+          { data: 'created_at' },
+          { data: 'actions', sortable: false },
         ],
-      fnDrawCallback: function( oSettings ) {
+        fnDrawCallback: function (oSettings) {
           $('[data-toggle="popover"]').popover();
         }
       });
