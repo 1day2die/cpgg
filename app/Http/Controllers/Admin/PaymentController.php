@@ -10,6 +10,7 @@ use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\PartnerDiscount;
+use App\Models\Coupon;
 use App\Models\Payment;
 use App\Models\User;
 use App\Models\ShopProduct;
@@ -148,6 +149,14 @@ class PaymentController extends Controller
             if ($couponCode) {
                 if ($this->isCouponValid($couponCode, $user, $shopProduct->id)) {
                     $subtotal = $this->applyCoupon($couponCode, $subtotal);
+
+                    $coupon = Coupon::where('code', $couponCode)->first();
+                    if ($coupon) {
+                        $user->coupons()->attach($coupon->id, [
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
 
                     event(new CouponUsedEvent($couponCode));
                 }

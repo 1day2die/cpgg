@@ -34,7 +34,8 @@ class Coupon extends Model
         'value',
         'uses',
         'max_uses',
-        'expires_at'
+        'expires_at',
+        'max_uses_per_user'
     ];
 
     /**
@@ -44,7 +45,8 @@ class Coupon extends Model
         'value' => 'float',
         'uses' => 'integer',
         'max_uses' => 'integer',
-        'expires_at' => 'timestamp'
+        'expires_at' => 'timestamp',
+        'max_uses_per_user' => 'integer',
     ];
 
     /**
@@ -107,7 +109,17 @@ class Coupon extends Model
             return false;
         }
         $coupon_uses = $user->coupons()->where('id', $this->id)->count();
-        return $coupon_uses >= $coupon_settings->max_uses_per_user;
+        $limit = $this->max_uses_per_user ?? $coupon_settings->max_uses_per_user;
+        if ($limit === null) {
+            return false; // No limit set anywhere
+        }
+
+        // Treat -1 as unlimited per-user uses
+        if ($limit === -1) {
+            return false;
+        }
+
+        return $coupon_uses >= $limit;
     }
 
     /**

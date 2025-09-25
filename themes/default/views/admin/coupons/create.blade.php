@@ -139,6 +139,25 @@
                     </div>
                   @enderror
                 </div>
+                <div class="form-group">
+                  <label for="max_uses_per_user">
+                    {{ __('Max uses per user') }}
+                    <i data-toggle="popover" data-trigger="hover"
+                      data-content="{{__('The maximum number of times a single user can use this coupon. Leave empty to use global default. Set to -1 for unlimited per-user uses.')}}"
+                      class="fas fa-info-circle">
+                    </i>
+                  </label>
+                  <input name="max_uses_per_user" id="max_uses_per_user" type="number" step="any" min="-1"
+                    class="form-control @error('max_uses_per_user') is-invalid @enderror"
+                    value="{{ old('max_uses_per_user') }}">
+                  <small
+                    class="form-text text-muted">{{__('Leave empty to use global default. Set to -1 for unlimited per-user uses.')}}</small>
+                  @error('max_uses_per_user')
+                    <div class="text-danger">
+                      {{ $message }}
+                    </div>
+                  @enderror
+                </div>
                 <div class="d-flex flex-column input-group form-group date" id="expires_at" data-target-input="nearest">
                   <label for="expires_at">
                     {{ __('Expires at') }}
