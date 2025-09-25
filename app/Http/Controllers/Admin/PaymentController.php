@@ -72,7 +72,8 @@ class PaymentController extends Controller
                 $extensionName = basename($extension);
 
                 $extensionSettings = ExtensionHelper::getExtensionSettings($extensionName);
-                if ($extensionSettings->enabled == false) continue;
+                if ($extensionSettings->enabled == false)
+                    continue;
 
 
                 $payment = new \stdClass();
@@ -90,7 +91,7 @@ class PaymentController extends Controller
             'taxvalue' => $shopProduct->getTaxValue(),
             'taxpercent' => $shopProduct->getTaxPercent(),
             'total' => $shopProduct->getTotalPrice(),
-            'paymentGateways'   => $paymentGateways,
+            'paymentGateways' => $paymentGateways,
             'productIsFree' => $price <= 0,
             'credits_display_name' => $general_settings->credits_display_name,
             'isCouponsEnabled' => $coupon_settings->enabled,
@@ -149,16 +150,8 @@ class PaymentController extends Controller
             if ($couponCode) {
                 if ($this->isCouponValid($couponCode, $user, $shopProduct->id)) {
                     $subtotal = $this->applyCoupon($couponCode, $subtotal);
-
                     $coupon = Coupon::where('code', $couponCode)->first();
-                    if ($coupon) {
-                        $user->coupons()->attach($coupon->id, [
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
-                    }
-
-                    event(new CouponUsedEvent($couponCode));
+                    event(new CouponUsedEvent($couponCode, $user));
                 }
             }
 
