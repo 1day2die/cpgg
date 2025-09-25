@@ -194,7 +194,7 @@ class RegisterController extends Controller
                     activity()
                         ->performedOn($user)
                         ->causedBy($ref_user)
-                        ->log('gained ' . Currency::formatForDisplay($this->referral_reward) . ' ' . $this->credits_display_name . ' for sign-up-referral of ' . $user->name . ' (ID:' . $user->id . ')');
+                        ->log('gained ' . $this->currency_helper->formatForDisplay($this->referral_reward) . ' ' . $this->credits_display_name . ' for sign-up-referral of ' . $user->name . ' (ID:' . $user->id . ')');
                 }
                 //INSERT INTO USER_REFERRALS TABLE
                 DB::table('user_referrals')->insert([
