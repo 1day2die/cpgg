@@ -78,16 +78,13 @@ class Coupon extends Model
      */
     public function getStatus()
     {
-        // Unlimited uses if max_uses is -1
-        if ($this->max_uses == -1) {
-            // Unlimited coupons are always valid unless expired
-        } elseif ($this->uses >= $this->max_uses) {
+        if ($this->uses >= $this->max_uses && $this->max_uses != -1) {
             return 'USES_LIMIT_REACHED';
         }
 
         if (!is_null($this->expires_at)) {
             if ($this->expires_at <= Carbon::now(config('app.timezone'))->timestamp) {
-                return __('EXPIRED');
+            return __('EXPIRED');
             }
         }
 
