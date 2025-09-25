@@ -187,14 +187,14 @@ class RegisterController extends Controller
             $new_user = $user->id;
             if ($ref_user = User::query()->where('referral_code', '=', $ref_code)->first()) {
                 if ($this->referral_mode === 'sign-up' || $this->referral_mode === 'both') {
-                    $ref_user->increment('credits', Currency::prepareForDatabase($this->referral_reward));
+                    $ref_user->increment('credits', ($this->referral_reward));
                     $ref_user->notify(new ReferralNotification($ref_user->id, $new_user));
 
                     //LOGS REFERRALS IN THE ACTIVITY LOG
                     activity()
                         ->performedOn($user)
                         ->causedBy($ref_user)
-                        ->log('gained ' . $this->referral_reward . ' ' . $this->credits_display_name . ' for sign-up-referral of ' . $user->name . ' (ID:' . $user->id . ')');
+                        ->log('gained ' . Currency::formatForDisplay($this->referral_reward) . ' ' . $this->credits_display_name . ' for sign-up-referral of ' . $user->name . ' (ID:' . $user->id . ')');
                 }
                 //INSERT INTO USER_REFERRALS TABLE
                 DB::table('user_referrals')->insert([

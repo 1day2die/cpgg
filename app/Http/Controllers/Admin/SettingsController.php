@@ -160,10 +160,14 @@ class SettingsController extends Controller
             }
 
             $nullable = $rpType->allowsNull();
-            if ($nullable)
-                $settingsClass->$key = $request->input($key) ?? null;
-            else
-                $settingsClass->$key = $request->input($key);
+            $inputValue = $nullable ? ($request->input($key) ?? null) : $request->input($key);
+
+            // using currency facade for reward field
+            if ($key === 'reward' && $inputValue !== null && $inputValue !== '') {
+                $inputValue = Currency::prepareForDatabase($inputValue);
+            }
+
+            $settingsClass->$key = $inputValue;
         }
         $settingsClass->save();
 

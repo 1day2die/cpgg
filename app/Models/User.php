@@ -22,7 +22,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\CausesActivity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
-
+use Spatie\Activitylog\Models\Activity;
 /**
  * Class User
  */
@@ -195,11 +195,16 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     // tap into activity log to convert db value to display value
-    public function tapActivity(\Spatie\Activitylog\Models\Activity $activity, string $eventName)
+    public function tapActivity(Activity $activity, string $eventName)
     {
-        if ($eventName === 'deleted' && isset($activity->properties['attributes']['credits'])) {
-            $activity->properties['attributes']['credits'] = \App\Facades\Currency::convertForDisplay($activity->properties['attributes']['credits']);
+        if (($eventName === 'deleted' || $eventName === 'created') && $activity->properties->has('attributes')) {
+            $attributes = $activity->properties->get('attributes');
+            if (isset($attributes['credits'])) {
+                $attributes['credits'] = Currency::formatForDisplay($attributes['credits']);
+                $activity->properties->put('attributes', $attributes);
+            }
         }
+
     }
 
     /**
