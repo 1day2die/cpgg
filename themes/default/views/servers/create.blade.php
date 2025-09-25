@@ -219,13 +219,13 @@
                                                     <span class="d-inline-block"><i class="fas fa-microchip"></i>
                                                         {{ __('CPU') }}</span>
                                                     <span class=" d-inline-block"
-                                                        x-text="product.cpu == 0 ? '∞' : (product.cpu + ' {{ __('vCores') }}')"></span>
+                                                        x-text="product.cpu == 0 ? 'Unlimited' : (product.cpu + ' {{ __('vCores') }}')"></span>
                                                 </li>
                                                 <li class="d-flex justify-content-between">
                                                     <span class="d-inline-block"><i class="fas fa-memory"></i>
                                                         {{ __('Memory') }}</span>
                                                     <span class=" d-inline-block"
-                                                        x-text="product.memory == 0 ? '∞' : (product.memory + ' {{ __('MB') }}')"></span>
+                                                        x-text="product.memory == 0 ? 'Unlimited' : (product.memory + ' {{ __('MB') }}')"></span>
                                                 </li>
                                                 <li class="d-flex justify-content-between">
                                                     <div>
@@ -235,7 +235,7 @@
                                                         </span>
                                                     </div>
                                                     <span class="d-inline-block"
-                                                        x-text="product.disk == 0 ? '∞' : (product.disk + ' {{ __('MB') }}')"></span>
+                                                        x-text="product.disk == 0 ? 'Unlimited' : (product.disk + ' {{ __('MB') }}')"></span>
                                                 </li>
                                                 <li class="d-flex justify-content-between">
                                                     <span class="d-inline-block"><i class="fas fa-save"></i>

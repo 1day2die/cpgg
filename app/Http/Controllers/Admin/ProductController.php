@@ -82,7 +82,14 @@ class ProductController extends Controller
             'price' => 'required|numeric|max:1000000|min:0',
             'memory' => 'required|numeric|max:1000000|min:0',
             'cpu' => 'required|numeric|max:1000000|min:0',
-            'swap' => 'required|numeric|max:1000000|min:0',
+            'swap' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if ($value != -1 && (!ctype_digit((string) $value) || strlen((string) $value) > 100)) {
+                        $fail(__('Swap must be -1 for unlimited or a positive integer with at most 100 digits.'));
+                    }
+                }
+            ],
             'description' => 'required|string|max:191',
             'disk' => 'required|numeric|max:1000000|min:0',
             'minimum_credits' => 'nullable|numeric|max:1000000',
@@ -160,7 +167,14 @@ class ProductController extends Controller
             'price' => 'required|numeric|max:1000000|min:0',
             'memory' => 'required|numeric|max:1000000|min:0',
             'cpu' => 'required|numeric|max:1000000|min:0',
-            'swap' => 'required|numeric|max:1000000|min:0',
+            'swap' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if ($value != -1 && (!ctype_digit((string) $value) || strlen((string) $value) > 100)) {
+                        $fail(__('Swap must be -1 for unlimited or a positive integer with at most 100 digits.'));
+                    }
+                }
+            ],
             'description' => 'required|string|max:191',
             'disk' => 'required|numeric|max:1000000|min:0',
             'io' => 'required|numeric|max:1000000|min:0',
@@ -281,16 +295,22 @@ class ProductController extends Controller
                 return $product->serverlimit == 0 ? "∞" : $product->serverlimit;
             })
             ->editColumn('memory', function (Product $product) {
-                return $product->memory == 0 ? "∞" : $product->memory;
+                return $product->memory == 0 ? "Unlimited" : $product->memory;
             })
             ->editColumn('cpu', function (Product $product) {
-                return $product->cpu == 0 ? "∞" : $product->cpu;
+                return $product->cpu == 0 ? "Unlimited" : $product->cpu;
             })
             ->editColumn('swap', function (Product $product) {
-                return $product->swap == 0 ? "∞" : $product->swap;
+                if ($product->swap == -1) {
+                    return "Unlimited";
+                } elseif ($product->swap == 0) {
+                    return __("Disabled");
+                } else {
+                    return $product->swap;
+                }
             })
             ->editColumn('disk', function (Product $product) {
-                return $product->disk == 0 ? "∞" : $product->disk;
+                return $product->disk == 0 ? "Unlimited" : $product->disk;
             })
             ->editColumn('oom_killer', function (Product $product) {
                 return $product->oom_killer ? __("enabled") : __("disabled");

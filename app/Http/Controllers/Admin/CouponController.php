@@ -177,11 +177,8 @@ class CouponController extends Controller
                 'required',
                 'integer',
                 function ($attribute, $value, $fail) {
-                    if ($value != -1 && (!is_numeric($value) || $value < 1 || $value > 99999999999999999999)) {
-                        $fail(__('Max uses must be -1 for unlimited or a number between 1 and 100 digits.'));
-                    }
-                    if ($value != -1 && strlen((string) $value) > 100) {
-                        $fail(__('Max uses must be at most 100 digits.'));
+                    if ($value != -1 && (!ctype_digit($value) || strlen($value) > 100)) {
+                        $fail(__('Max uses must be -1 for unlimited or a positive integer with at most 100 digits.'));
                     }
                 }
             ],
@@ -249,7 +246,7 @@ class CouponController extends Controller
                 return '<span class="badge badge-' . $color . '">' . $status . '</span>';
             })
             ->editColumn('uses', function (Coupon $coupon) {
-                $maxUses = $coupon->max_uses == -1 ? '∞' : $coupon->max_uses;
+                $maxUses = $coupon->max_uses == -1 ? 'Unlimited' : $coupon->max_uses;
                 return "{$coupon->uses} / {$maxUses}";
             })
             ->editColumn('value', function (Coupon $coupon, CurrencyHelper $currencyHelper) {
@@ -277,7 +274,7 @@ class CouponController extends Controller
                     return __('Global');
                 }
 
-                return $coupon->max_uses_per_user == -1 ? '∞' : $coupon->max_uses_per_user;
+                return $coupon->max_uses_per_user == -1 ? 'Unlimited' : $coupon->max_uses_per_user;
             })
             ->orderColumn('status', 'derived_status $1')
             ->rawColumns(['actions', 'code', 'status'])
