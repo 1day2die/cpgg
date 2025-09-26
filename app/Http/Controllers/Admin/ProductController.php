@@ -295,14 +295,14 @@ class ProductController extends Controller
                 return $product->serverlimit == 0 ? "∞" : $product->serverlimit;
             })
             ->editColumn('memory', function (Product $product) {
-                return $product->memory == 0 ? "Unlimited" : $product->memory;
+                return $product->memory == 0 ? "∞" : $product->memory;
             })
             ->editColumn('cpu', function (Product $product) {
-                return $product->cpu == 0 ? "Unlimited" : $product->cpu;
+                return $product->cpu == 0 ? "∞" : $product->cpu;
             })
             ->editColumn('swap', function (Product $product) {
                 if ($product->swap == -1) {
-                    return "Unlimited";
+                    return "∞";
                 } elseif ($product->swap == 0) {
                     return __("Disabled");
                 } else {
@@ -310,7 +310,7 @@ class ProductController extends Controller
                 }
             })
             ->editColumn('disk', function (Product $product) {
-                return $product->disk == 0 ? "Unlimited" : $product->disk;
+                return $product->disk == 0 ? "∞" : $product->disk;
             })
             ->editColumn('oom_killer', function (Product $product) {
                 return $product->oom_killer ? __("enabled") : __("disabled");

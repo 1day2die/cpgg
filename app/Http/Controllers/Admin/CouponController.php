@@ -229,7 +229,7 @@ class CouponController extends Controller
                 return '<span class="badge badge-' . $color . '">' . $status . '</span>';
             })
             ->editColumn('uses', function (Coupon $coupon) {
-                $maxUses = $coupon->max_uses == -1 ? 'Unlimited' : $coupon->max_uses;
+                $maxUses = $coupon->max_uses == -1 ? '∞' : $coupon->max_uses;
                 return "{$coupon->uses} / {$maxUses}";
             })
             ->editColumn('value', function (Coupon $coupon, CurrencyHelper $currencyHelper) {
