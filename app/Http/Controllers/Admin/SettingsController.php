@@ -162,8 +162,16 @@ class SettingsController extends Controller
             $nullable = $rpType->allowsNull();
             $inputValue = $nullable ? ($request->input($key) ?? null) : $request->input($key);
 
-            // using currency facade for reward field
-            if ($key === 'reward' && $inputValue !== null && $inputValue !== '') {
+            // using currency facade for reward and other currency fields
+            $currencyKeys = [
+                'reward',
+                'credits_reward_after_verify_discord',
+                'credits_reward_after_verify_email',
+                'initial_credits',
+                'min_credits_to_make_server',
+            ];
+
+            if (in_array($key, $currencyKeys) && $inputValue !== null && $inputValue !== '') {
                 $inputValue = Currency::prepareForDatabase($inputValue);
             }
 
