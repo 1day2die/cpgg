@@ -268,23 +268,25 @@
 
 
                     @foreach ($referrals as $referral)
-                        <div class="col-lg-6">
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <label>User ID: {{ $referral->id }}</label>
-                                </div>
-                                <div class="col-lg-4">
-                                    <span style="max-width: 250px;" class="d-inline-block text-truncate">
-                                        <i class="mr-2 fas fa-user-check"></i><a
-                                            href="{{ route('admin.users.show', $referral->id) }}">{{ $referral->name }}</a>
-                                    </span>
-                                </div>
-                                <div class="col-lg-4">
-                                    <span style="max-width: 250px;" class="d-inline-block text-truncate">
-                                        <i class="mr-2 fas fa-clock"></i>{{ $referral->created_at->diffForHumans() }}
-                                    </span>
-                                </div>
-                            </div>
+                        <div class="row mb-3 align-items-center">
+                          <div class="col-md-4 col-sm-12 mb-1 mb-md-0">
+                            <label class="mb-0">User ID: {{ $referral->id ?? 'Deleted' }}</label>
+                          </div>
+                          <div class="col-md-4 col-sm-12 mb-1 mb-md-0">
+                            <span class="d-inline-block text-truncate" style="max-width:250px;">
+                              <i class="mr-2 fas fa-user-check"></i>
+                              @if ($referral->deleted ?? false)
+                                <span class="text-danger">{{ $referral->name }}</span>
+                              @else
+                                <a href="{{ route('admin.users.show', $referral->id) }}">{{ $referral->name }}</a>
+                              @endif
+                            </span>
+                          </div>
+                          <div class="col-md-4 col-sm-12">
+                            <span class="d-inline-block text-truncate" style="max-width:250px;">
+                              <i class="mr-2 fas fa-clock"></i>{{ \Carbon\Carbon::parse($referral->created_at)->diffForHumans() }}
+                            </span>
+                          </div>
                         </div>
                     @endforeach
                 </div>

@@ -29,6 +29,7 @@ use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Models\Role;
 use Illuminate\Support\Facades\Log;
+use Spatie\Activitylog\Models\Activity;
 
 class UserController extends Controller
 {
@@ -85,14 +86,80 @@ class UserController extends Controller
     {
         $this->checkPermission(self::READ_PERMISSION);
 
-        //QUERY ALL REFERRALS A USER HAS
-        //i am not proud of this at all.
+        $referralRecords = DB::table('user_referrals')->where('referral_id', '=', $user->id)->get();
         $allReferals = [];
-        $referrals = DB::table('user_referrals')->where('referral_id', '=', $user->id)->get();
-        foreach ($referrals as $referral) {
-            array_push($allReferals, $allReferals['id'] = User::query()->findOrFail($referral->registered_user_id));
+
+        foreach ($referralRecords as $referral) {
+            $deleted = $referral->deleted_at !== null;
+
+            // default values
+            $name = 'Deleted User';
+            $deletedId = $referral->registered_user_id;
+
+            if ($deleted) {
+                $creationLog = Activity::query()
+                    ->where('subject_type', User::class)
+                    ->where('event', 'created')
+                    ->where('subject_id', $referral->registered_user_id)
+                    ->latest()
+                    ->first();
+
+                if ($creationLog) {
+                    $props = $creationLog->properties?->toArray() ?? [];
+                    if (isset($props['attributes']['name'])) {
+                        $name = $props['attributes']['name'] . ' (deleted)';
+                    }
+                    $deletedId = $creationLog->subject_id ?? $deletedId;
+                } else {
+                    // fallback incase of errors
+                    $refLog = Activity::query()
+                        ->where('description', 'like', '%referral%')
+                        ->where(function ($q) use ($referral) {
+                            $q->where('description', 'like', '%' . $referral->registered_user_id . '%')
+                                ->orWhere('properties', 'like', '%' . $referral->registered_user_id . '%');
+                        })
+                        ->latest()
+                        ->first();
+
+                    if ($refLog) {
+                        $desc = $refLog->description ?? '';
+                        if (preg_match('/of\s+(.+?)\s*\(ID:\s*(\d+)\)/i', $desc, $m)) {
+                            $name = trim($m[1]) . ' (deleted)';
+                            $deletedId = (int)$m[2];
+                        } else {
+                            $props = $refLog->properties?->toArray() ?? [];
+                            if (isset($props['attributes']['name'])) {
+                                $name = $props['attributes']['name'] . ' (deleted)';
+                            }
+                        }
+                    }
+                }
+
+                $allReferals[] = (object)[
+                    'id' => $deletedId,
+                    'name' => $name,
+                    'created_at' => $referral->created_at,
+                    'deleted' => true,
+                ];
+            } else {
+                $userObj = User::query()->find($referral->registered_user_id);
+                if ($userObj) {
+                    $allReferals[] = (object)[
+                        'id' => $userObj->id,
+                        'name' => $userObj->name,
+                        'created_at' => $userObj->created_at,
+                        'deleted' => false,
+                    ];
+                } else {
+                    $allReferals[] = (object)[
+                        'id' => null,
+                        'name' => 'Unknown (deleted)',
+                        'created_at' => $referral->created_at,
+                        'deleted' => true,
+                    ];
+                }
+            }
         }
-        array_pop($allReferals);
 
         return view('admin.users.show')->with([
             'user' => $user,
@@ -331,7 +398,7 @@ class UserController extends Controller
     {
         $this->checkPermission(self::NOTIFY_PERMISSION);
 
-//TODO: reimplement the required validation on all,users and roles . didnt work -- required_without:users,roles
+        //TODO: reimplement the required validation on all,users and roles . didnt work -- required_without:users,roles
         $data = $request->validate([
             'via' => 'required|min:1|array',
             'via.*' => 'required|string|in:mail,database',
