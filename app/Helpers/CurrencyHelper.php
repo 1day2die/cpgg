@@ -6,7 +6,7 @@ use NumberFormatter;
 
 class CurrencyHelper
 {
-    public function convertForDisplay($amount)
+    private function convertForDisplay($amount)
     {
         return $amount / 1000;
     }
