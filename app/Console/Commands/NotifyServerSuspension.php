@@ -99,8 +99,8 @@ class NotifyServerSuspension extends Command
                             $suspensionDate = Carbon::parse($server->last_billed)->addHour();
                             break;
                     }
-                    $userCredits = ($user->credits)/1000;
-                    $serverPrice = ($product->price)/1000;
+                    $userCredits = $currencyHelper->formatForCommands($user->credits);
+                    $serverPrice = $currencyHelper->formatForCommands($product->price);
 
                     $isCanceled = $server->canceled;
                     $hasInsufficientCredits = $userCredits < $serverPrice && $serverPrice != 0;

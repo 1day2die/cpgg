@@ -34,4 +34,8 @@ class CurrencyHelper
 
         return $formatter->formatCurrency($this->convertForDisplay($amount), $currency_code);
     }
+
+    public function formatForCommands($amount){
+        return $this->convertForDisplay($amount);
+    }
 }
