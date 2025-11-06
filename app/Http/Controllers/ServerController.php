@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Support\Facades\Cache;
 
 class ServerController extends Controller
 {
@@ -305,6 +306,7 @@ class ServerController extends Controller
 
         $user->decrement('credits', $server->product->price);
 
+        Cache::forget('user_credits_left:' . $user->id);
         try {
             if ($this->discordSettings->role_for_active_clients &&
                 $user->discordUser &&
@@ -362,6 +364,7 @@ class ServerController extends Controller
         }
 
         $server->delete();
+        Cache::forget('user_credits_left:' . $server->user_id);
     }
 
     public function cancel(Server $server): RedirectResponse
