@@ -6,7 +6,6 @@ use App\Helpers\CurrencyHelper;
 use App\Settings\MailSettings;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-
 class ServerSuspensionWarningNotification extends Notification
 {
     protected $servers;
@@ -19,33 +18,6 @@ class ServerSuspensionWarningNotification extends Notification
     public function __construct($servers)
     {
         $this->servers = $servers;
-    }
-
-    /**
-     * Format time remaining until suspension (similar to HomeController)
-     */
-    protected function formatTimeLeft($date)
-    {
-        if (!$date) return 'Unknown';
-
-        $now = now();
-        $daysLeft = $now->diffInDays($date, false);
-        $hoursLeft = $now->diffInHours($date, false);
-        $minutesLeft = $now->diffInMinutes($date, false);
-
-        if ($daysLeft > 0) {
-            return floor($daysLeft) . ' ' . (floor($daysLeft) == 1 ? 'day' : 'days');
-        }
-
-        if ($hoursLeft > 0) {
-            return floor($hoursLeft) . ' ' . (floor($hoursLeft) == 1 ? 'hour' : 'hours');
-        }
-
-        if ($minutesLeft > 0) {
-            return floor($minutesLeft) . ' ' . (floor($minutesLeft) == 1 ? 'minute' : 'minutes');
-        }
-
-        return 'Less than 1 minute';
     }
 
     /**
