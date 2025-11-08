@@ -35,7 +35,15 @@ class CurrencyHelper
         return $formatter->formatCurrency($this->convertForDisplay($amount), $currency_code);
     }
 
-    public function formatForCommands($amount){
+    /**
+     * Formats the given amount for use in commands.
+     *
+     * Converts the amount from the smallest currency unit to a float.
+     *
+     * @param int $amount Amount in the smallest currency unit (e.g., thousandths).
+     * @return float Converted amount for commands.
+     */
+    public function formatForCommands($amount) {
         return $this->convertForDisplay($amount);
     }
 }

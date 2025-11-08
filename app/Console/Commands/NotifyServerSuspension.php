@@ -38,7 +38,7 @@ class NotifyServerSuspension extends Command
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(protected CurrencyHelper $currencyHelper)
     {
         parent::__construct();
     }
@@ -52,13 +52,16 @@ class NotifyServerSuspension extends Command
     {
         $serversChecked = 0;
         $serversNotified = 0;
-        $currencyHelper = new CurrencyHelper();
 
-        // Get all servers that are not suspended
+        // First, clear warnings for servers that are no longer at risk
+        $this->clearResolvedWarnings();
+
+        // Get all servers that are not suspended and haven't been warned yet
         Server::whereNull('suspended')
+            ->whereNull('suspension_warning_sent_at')
             ->with(['user', 'product'])
             ->byBillingPriority()
-            ->chunk(10, function ($servers) use (&$serversChecked, &$serversNotified, $currencyHelper) {
+            ->chunk(10, function ($servers) use (&$serversChecked, &$serversNotified) {
                 /** @var Server $server */
                 foreach ($servers as $server) {
                     $serversChecked++;
@@ -95,24 +98,24 @@ class NotifyServerSuspension extends Command
                             break;
                         case 'hourly':
                             $suspensionDate = Carbon::parse($server->last_billed)->addHour();
+                            break;
                         default:
                             $suspensionDate = Carbon::parse($server->last_billed)->addHour();
                             break;
                     }
-                    $userCredits = $currencyHelper->formatForCommands($user->credits);
-                    $serverPrice = $currencyHelper->formatForCommands($product->price);
+                    $userCredits = $this->currencyHelper->formatForCommands($user->credits);
+                    $serverPrice = $this->currencyHelper->formatForCommands($product->price);
 
-                    $isCanceled = $server->canceled;
                     $hasInsufficientCredits = $userCredits < $serverPrice && $serverPrice != 0;
 
-                    if (!($isCanceled || $hasInsufficientCredits)) {
+                    if (!$hasInsufficientCredits) {
                         continue;
                     }
 
                     $now = Carbon::now();
                     $daysUntilSuspension = $now->diffInDays($suspensionDate, false);
 
-                    if ($daysUntilSuspension >= 0 && $daysUntilSuspension <= 3) {
+                    if ($daysUntilSuspension > 0 && $daysUntilSuspension <= 3) {
                         $this->line("<fg=yellow>{$server->name}</> from user: <fg=blue>{$user->name}</> will be suspended in <fg=cyan>{$daysUntilSuspension}</> days. Sending warning...");
 
                         $server->update(['suspension_warning_sent_at' => now()]);
@@ -131,12 +134,54 @@ class NotifyServerSuspension extends Command
                     }
                 }
 
-                return $this->notifyUsers();
+                // Notifications will be sent after processing all chunks
             });
+
+        $this->notifyUsers();
 
         $this->info("Completed! Checked: {$serversChecked} servers, Notified: {$serversNotified} servers");
 
         return 0;
+    }
+
+    /**
+     * Clear suspension warnings for servers that are no longer at risk
+     * (i.e., servers that were warned but now have sufficient credits)
+     */
+    private function clearResolvedWarnings()
+    {
+        $clearedCount = 0;
+
+        Server::whereNotNull('suspension_warning_sent_at')
+            ->whereNull('suspended')
+            ->with(['user', 'product'])
+            ->chunk(10, function ($servers) use (&$clearedCount) {
+                foreach ($servers as $server) {
+                    /** @var Product $product */
+                    $product = $server->product;
+                    /** @var User $user */
+                    $user = $server->user;
+
+                    if (!$product || !$user) {
+                        continue;
+                    }
+
+                    $userCredits = $this->currencyHelper->formatForCommands($user->credits);
+                    $serverPrice = $this->currencyHelper->formatForCommands($product->price);
+
+                    $hasSufficientCredits = $userCredits >= $serverPrice || $serverPrice == 0;
+
+                    if ($hasSufficientCredits) {
+                        $server->update(['suspension_warning_sent_at' => null]);
+                        $clearedCount++;
+                        $this->line("<fg=green>{$server->name}</> from user: <fg=blue>{$user->name}</> - Warning cleared (sufficient credits)");
+                    }
+                }
+            });
+
+        if ($clearedCount > 0) {
+            $this->info("Cleared warnings for {$clearedCount} servers that now have sufficient credits");
+        }
     }
 
     /**
@@ -152,7 +197,7 @@ class NotifyServerSuspension extends Command
                 if ($servers->isNotEmpty()) {
                     $this->line("<fg=yellow>Notified user:</> <fg=blue>{$user->name}</>");
 
-                       $sortedServers = $servers->sortBy(function ($serverData) {
+                    $sortedServers = $servers->sortBy(function ($serverData) {
                         return $serverData['suspension_date']->timestamp;
                     });
 
