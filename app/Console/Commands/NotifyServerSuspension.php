@@ -136,7 +136,7 @@ class NotifyServerSuspension extends Command
 
         $this->notifyUsers();
 
-        $this->info("Completed! Checked: {$serversChecked} servers, Notified: {$serversNotified} servers");
+        $this->info("Completed! Checked: {$serversChecked} servers, Sent warnings for: {$serversNotified} servers");
 
         return 0;
     }
