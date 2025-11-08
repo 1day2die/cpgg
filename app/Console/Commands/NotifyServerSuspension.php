@@ -103,10 +103,7 @@ class NotifyServerSuspension extends Command
                             $suspensionDate = Carbon::parse($server->last_billed)->addHour();
                             break;
                     }
-                    $userCredits = $this->currencyHelper->formatForCommands($user->credits);
-                    $serverPrice = $this->currencyHelper->formatForCommands($product->price);
-
-                    $hasInsufficientCredits = $userCredits < $serverPrice && $serverPrice != 0;
+                    $hasInsufficientCredits = $this->hasInsufficientCredits($user, $product);
 
                     if (!$hasInsufficientCredits) {
                         continue;
@@ -166,10 +163,7 @@ class NotifyServerSuspension extends Command
                         continue;
                     }
 
-                    $userCredits = $this->currencyHelper->formatForCommands($user->credits);
-                    $serverPrice = $this->currencyHelper->formatForCommands($product->price);
-
-                    $hasSufficientCredits = $userCredits >= $serverPrice || $serverPrice == 0;
+                    $hasSufficientCredits = !$this->hasInsufficientCredits($user, $product);
 
                     if ($hasSufficientCredits) {
                         $server->update(['suspension_warning_sent_at' => null]);
@@ -197,11 +191,7 @@ class NotifyServerSuspension extends Command
                 if ($servers->isNotEmpty()) {
                     $this->line("<fg=yellow>Notified user:</> <fg=blue>{$user->name}</>");
 
-                    $sortedServers = $servers->sortBy(function ($serverData) {
-                        return $serverData['suspension_date']->timestamp;
-                    });
-
-                    $user->notify(new ServerSuspensionWarningNotification($sortedServers));
+                    $user->notify(new ServerSuspensionWarningNotification($servers));
                 }
             }
         }
@@ -209,5 +199,20 @@ class NotifyServerSuspension extends Command
         // Reset array
         $this->usersToNotify = [];
         return true;
+    }
+
+    /**
+     * Check if user has insufficient credits for the product
+     *
+     * @param $user
+     * @param $product
+     * @return bool
+     */
+    private function hasInsufficientCredits($user, $product)
+    {
+        $userCredits = $this->currencyHelper->formatForCommands($user->credits);
+        $serverPrice = $this->currencyHelper->formatForCommands($product->price);
+
+        return $userCredits < $serverPrice && $serverPrice != 0;
     }
 }

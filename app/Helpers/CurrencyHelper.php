@@ -43,7 +43,8 @@ class CurrencyHelper
      * @param int $amount Amount in the smallest currency unit (e.g., thousandths).
      * @return float Converted amount for commands.
      */
-    public function formatForCommands($amount) {
+    public function formatForCommands($amount)
+    {
         return $this->convertForDisplay($amount);
     }
 }

@@ -75,16 +75,13 @@ class ServerSuspensionWarningNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        $sortedServers = $this->servers->sortBy(function ($serverData) {
-            $server = $serverData['server'];
-            return $server->billing_priority ?? $server->product->default_billing_priority;
-        });
+        $sortedServers = $this->getSortedServersByPriority();
 
-        $totalCreditsNeeded = 0;
-        $serverList = $sortedServers->map(function ($serverData, $index) use (&$totalCreditsNeeded) {
+        $totalCreditsNeeded = $sortedServers->sum(function ($serverData) {
+            return $serverData['server']->product->price;
+        });
+        $serverList = $sortedServers->map(function ($serverData, $index) {
             $server = $serverData['server'];
-            $timeLeft = $this->formatTimeLeft($serverData['suspension_date']);
-            $totalCreditsNeeded += $server->product->price;
             return $server->name . ' (will be suspended on ' . $serverData['suspension_date']->format('M j, Y \a\t g:i A') . ')';
         })->implode(', ');
 
@@ -117,22 +114,19 @@ class ServerSuspensionWarningNotification extends Notification
     public function toArray($notifiable)
     {
         // Sort servers by billing priority (LOW first = suspended first, HIGH last = suspended last)
-        $sortedServers = $this->servers->sortBy(function ($serverData) {
-            $server = $serverData['server'];
-            return $server->billing_priority ?? $server->product->default_billing_priority;
-        });
+        $sortedServers = $this->getSortedServersByPriority();
 
-        $totalCreditsNeeded = 0;
-        $serverList = $sortedServers->map(function ($serverData, $index) use (&$totalCreditsNeeded) {
+        $totalCreditsNeeded = $sortedServers->sum(function ($serverData) {
+            return $serverData['server']->product->price;
+        });
+        $serverList = $sortedServers->map(function ($serverData, $index) {
             $server = $serverData['server'];
-            $timeLeft = $this->formatTimeLeft($serverData['suspension_date']);
             $priorityText = '';
             if ($index === 0) {
                 $priorityText = ' <strong>(Lowest priority - suspended first)</strong>';
             } elseif ($index === $this->servers->count() - 1 && $this->servers->count() > 1) {
                 $priorityText = ' <strong>(Highest priority - suspended last)</strong>';
             }
-            $totalCreditsNeeded += $server->product->price;
             return '<li>' . $server->name . ' (will be suspended on ' . $serverData['suspension_date']->format('M j, Y \a\t g:i A') . ')' . $priorityText . '</li>';
         })->implode('');
 
@@ -159,5 +153,18 @@ class ServerSuspensionWarningNotification extends Notification
                 <p><em>Best regards,<br />' . config('app.name', 'CtrlPanel') . '</em></p>
             ',
         ];
+    }
+
+    /**
+     * Get servers sorted by billing priority.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    private function getSortedServersByPriority()
+    {
+        return $this->servers->sortBy(function ($serverData) {
+            $server = $serverData['server'];
+            return $server->billing_priority ?? $server->product->default_billing_priority;
+        });
     }
 }
