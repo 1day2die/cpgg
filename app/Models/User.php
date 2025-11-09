@@ -135,8 +135,7 @@ class User extends Authenticatable implements MustVerifyEmail
             foreach ($referralRecords as $ref) {
                 // mark ref as deleted and persist the deleted user id and name
                 DB::table('user_referrals')
-                    ->where('referral_id', $ref->referral_id)
-                    ->where('registered_user_id', $ref->registered_user_id)
+                    ->where('id', $ref->id)
                     ->update([
                         'deleted_at' => now(),
                         'deleted_username' => $user->name,

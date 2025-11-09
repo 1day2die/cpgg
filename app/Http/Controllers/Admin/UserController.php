@@ -86,7 +86,7 @@ class UserController extends Controller
         $this->checkPermission(self::READ_PERMISSION);
 
         $referralRecords = DB::table('user_referrals')->where('referral_id', '=', $user->id)->get();
-        $allReferals = [];
+        $allReferrals = [];
 
         foreach ($referralRecords as $referral) {
             $deleted = $referral->deleted_at !== null;
@@ -95,7 +95,7 @@ class UserController extends Controller
                 $deletedId = $referral->deleted_user_id;
                 $name = $referral->deleted_username ? $referral->deleted_username . ' (deleted)' : 'Deleted User';
 
-                $allReferals[] = (object)[
+                $allReferrals[] = (object)[
                     'id' => $deletedId,
                     'name' => $name,
                     'created_at' => \Carbon\Carbon::parse($referral->created_at),
@@ -104,26 +104,35 @@ class UserController extends Controller
             } else {
                 $userObj = User::query()->find($referral->registered_user_id);
                 if ($userObj) {
-                    $allReferals[] = (object)[
+                    $allReferrals[] = (object)[
                         'id' => $userObj->id,
                         'name' => $userObj->name,
                         'created_at' => $userObj->created_at,
                         'deleted' => false,
                     ];
                 } else {
-                    $allReferals[] = (object)[
-                        'id' => null,
-                        'name' => 'Unknown (deleted)',
-                        'created_at' => \Carbon\Carbon::parse($referral->created_at),
-                        'deleted' => true,
-                    ];
+                    if ($referral->deleted_user_id) {
+                        $allReferrals[] = (object)[
+                            'id' => $referral->deleted_user_id,
+                            'name' => ($referral->deleted_username ? $referral->deleted_username . ' (deleted)' : 'Deleted User'),
+                            'created_at' => \Carbon\Carbon::parse($referral->created_at),
+                            'deleted' => true,
+                        ];
+                    } else {
+                        $allReferrals[] = (object)[
+                            'id' => null,
+                            'name' => 'Unknown (deleted)',
+                            'created_at' => \Carbon\Carbon::parse($referral->created_at),
+                            'deleted' => true,
+                        ];
+                    }
                 }
             }
         }
 
         return view('admin.users.show')->with([
             'user' => $user,
-            'referrals' => $allReferals,
+            'referrals' => $allReferrals,
             'locale_datatables' => $locale_settings->datatables,
             'credits_display_name' => $general_settings->credits_display_name
         ]);

@@ -272,7 +272,11 @@
                     @foreach ($referrals as $referral)
                         <div class="row mb-3 align-items-center">
                             <div class="col-md-4 col-sm-12 mb-1 mb-md-0">
-                                <label class="mb-0">User ID: {{ $referral->id ?? 'N/A' }}</label>
+                                @if ($referral->deleted ?? false)
+                                    <label class="mb-0">Deleted User ID: {{ $referral->id ?? 'N/A' }}</label>
+                                @else
+                                    <label class="mb-0">User ID: {{ $referral->id }}</label>
+                                @endif
                             </div>
                             <div class="col-md-4 col-sm-12 mb-1 mb-md-0">
                                 <span class="d-inline-block text-truncate" style="max-width:250px;">
