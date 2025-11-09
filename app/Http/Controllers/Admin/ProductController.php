@@ -85,8 +85,8 @@ class ProductController extends Controller
             'swap' => [
                 'required',
                 function ($attribute, $value, $fail) {
-                    if ($value != -1 && (!ctype_digit((string) $value) || strlen((string) $value) > 100)) {
-                        $fail(__('Swap must be -1 for unlimited or a positive integer with at most 100 digits.'));
+                    if ($value != -1 && $value != 0 && (!ctype_digit((string) $value) || strlen((string) $value) > 100)) {
+                        $fail(__('Swap must be -1 for unlimited, 0 for disabled, or a positive integer with at most 100 digits.'));
                     }
                 }
             ],
@@ -170,8 +170,8 @@ class ProductController extends Controller
             'swap' => [
                 'required',
                 function ($attribute, $value, $fail) {
-                    if ($value != -1 && (!ctype_digit((string) $value) || strlen((string) $value) > 100)) {
-                        $fail(__('Swap must be -1 for unlimited or a positive integer with at most 100 digits.'));
+                    if ($value != -1 && $value != 0 && (!ctype_digit((string) $value) || strlen((string) $value) > 100)) {
+                        $fail(__('Swap must be -1 for unlimited, 0 for disabled, or a positive integer with at most 100 digits.'));
                     }
                 }
             ],

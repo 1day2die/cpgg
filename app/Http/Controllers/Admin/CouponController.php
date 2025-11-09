@@ -174,7 +174,7 @@ class CouponController extends Controller
                 'required',
                 'integer',
                 function ($attribute, $value, $fail) {
-                    if ($value != -1 && (!ctype_digit($value) || strlen($value) > 100)) {
+                    if ($value != -1 && ($value <= 0 || strlen((string) $value) > 100)) {
                         $fail(__('Max uses must be -1 for unlimited or a positive integer with at most 100 digits.'));
                     }
                 }
