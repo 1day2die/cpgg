@@ -29,7 +29,6 @@ use Illuminate\Validation\ValidationException;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Models\Role;
 use Illuminate\Support\Facades\Log;
-use Spatie\Activitylog\Models\Activity;
 
 class UserController extends Controller
 {
@@ -89,55 +88,12 @@ class UserController extends Controller
         $referralRecords = DB::table('user_referrals')->where('referral_id', '=', $user->id)->get();
         $allReferals = [];
 
-        // Pre-fetch activity logs for deleted users to avoid N+1 queries
-        $deletedIds = collect($referralRecords)->where('deleted_at', '!=', null)->pluck('registered_user_id')->unique();
-        $creationLogs = Activity::query()
-            ->where('subject_type', User::class)
-            ->where('event', 'created')
-            ->whereIn('subject_id', $deletedIds)
-            ->get()
-            ->keyBy('subject_id');
-
         foreach ($referralRecords as $referral) {
             $deleted = $referral->deleted_at !== null;
 
-            // default values
-            $name = 'Deleted User';
-            $deletedId = $referral->registered_user_id;
-
             if ($deleted) {
-                $creationLog = $creationLogs->get($referral->registered_user_id);
-
-                if ($creationLog) {
-                    $props = $creationLog->properties?->toArray() ?? [];
-                    if (isset($props['attributes']['name'])) {
-                        $name = $props['attributes']['name'] . ' (deleted)';
-                    }
-                    $deletedId = $creationLog->subject_id ?? $deletedId;
-                } else {
-                    // fallback in case of errors
-                    $refLog = Activity::query()
-                        ->where('description', 'like', '%referral%')
-                        ->where(function ($q) use ($referral) {
-                            $q->where('description', 'like', '%' . $referral->registered_user_id . '%')
-                                ->orWhere('properties', 'like', '%' . $referral->registered_user_id . '%');
-                        })
-                        ->latest()
-                        ->first();
-
-                    if ($refLog) {
-                        $desc = $refLog->description ?? '';
-                        if (preg_match('/of\s+(.+?)\s*\(ID:\s*(\d+)\)/i', $desc, $m)) {
-                            $name = trim($m[1]) . ' (deleted)';
-                            $deletedId = (int)$m[2];
-                        } else {
-                            $props = $refLog->properties?->toArray() ?? [];
-                            if (isset($props['attributes']['name'])) {
-                                $name = $props['attributes']['name'] . ' (deleted)';
-                            }
-                        }
-                    }
-                }
+                $deletedId = $referral->deleted_user_id;
+                $name = $referral->deleted_username ? $referral->deleted_username . ' (deleted)' : 'Deleted User';
 
                 $allReferals[] = (object)[
                     'id' => $deletedId,
