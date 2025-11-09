@@ -258,15 +258,5 @@ class CouponController extends Controller
             ->make();
     }
 
-    /**
-     * Normalize the max_uses_per_user input: empty becomes null
-     *
-     * @param mixed $value
-     * @return int|null
-     */
-    private function normalizeMaxUsesPerUser($value)
-    {
-        // method removed as per-coupon max_uses_per_user was removed
-        return null;
-    }
+
 }
