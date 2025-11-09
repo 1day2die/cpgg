@@ -15,6 +15,7 @@ return new class extends Migration {
         Schema::table('user_referrals', function (Blueprint $table) {
             $table->timestamp('deleted_at')->nullable();
             $table->string('deleted_username')->nullable();
+            $table->unsignedBigInteger('deleted_user_id')->nullable();
         });
     }
 
@@ -26,7 +27,7 @@ return new class extends Migration {
     public function down()
     {
         Schema::table('user_referrals', function (Blueprint $table) {
-            $table->dropColumn(['deleted_at', 'deleted_username']);
+            $table->dropColumn(['deleted_at', 'deleted_username', 'deleted_user_id']);
         });
     }
 };

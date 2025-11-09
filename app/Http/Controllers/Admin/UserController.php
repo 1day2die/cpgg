@@ -89,6 +89,15 @@ class UserController extends Controller
         $referralRecords = DB::table('user_referrals')->where('referral_id', '=', $user->id)->get();
         $allReferals = [];
 
+        // Pre-fetch activity logs for deleted users to avoid N+1 queries
+        $deletedIds = collect($referralRecords)->where('deleted_at', '!=', null)->pluck('registered_user_id')->unique();
+        $creationLogs = Activity::query()
+            ->where('subject_type', User::class)
+            ->where('event', 'created')
+            ->whereIn('subject_id', $deletedIds)
+            ->get()
+            ->keyBy('subject_id');
+
         foreach ($referralRecords as $referral) {
             $deleted = $referral->deleted_at !== null;
 
@@ -97,12 +106,7 @@ class UserController extends Controller
             $deletedId = $referral->registered_user_id;
 
             if ($deleted) {
-                $creationLog = Activity::query()
-                    ->where('subject_type', User::class)
-                    ->where('event', 'created')
-                    ->where('subject_id', $referral->registered_user_id)
-                    ->latest()
-                    ->first();
+                $creationLog = $creationLogs->get($referral->registered_user_id);
 
                 if ($creationLog) {
                     $props = $creationLog->properties?->toArray() ?? [];
@@ -111,7 +115,7 @@ class UserController extends Controller
                     }
                     $deletedId = $creationLog->subject_id ?? $deletedId;
                 } else {
-                    // fallback incase of errors
+                    // fallback in case of errors
                     $refLog = Activity::query()
                         ->where('description', 'like', '%referral%')
                         ->where(function ($q) use ($referral) {
@@ -138,7 +142,7 @@ class UserController extends Controller
                 $allReferals[] = (object)[
                     'id' => $deletedId,
                     'name' => $name,
-                    'created_at' => $referral->created_at,
+                    'created_at' => \Carbon\Carbon::parse($referral->created_at),
                     'deleted' => true,
                 ];
             } else {
@@ -154,7 +158,7 @@ class UserController extends Controller
                     $allReferals[] = (object)[
                         'id' => null,
                         'name' => 'Unknown (deleted)',
-                        'created_at' => $referral->created_at,
+                        'created_at' => \Carbon\Carbon::parse($referral->created_at),
                         'deleted' => true,
                     ];
                 }
