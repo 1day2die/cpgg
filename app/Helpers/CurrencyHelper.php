@@ -24,7 +24,7 @@ class CurrencyHelper
 
         if (!$ignoreOverride) {
             $override = resolve(\App\Settings\GeneralSettings::class)->currency_format_override ?? null;
-            if ($override && $override !== '') {
+            if ($override) {
                 $effectiveLocale = $override;
             }
         }
@@ -82,7 +82,7 @@ class CurrencyHelper
         return (int)($amount * 1000);
     }
 
-    public function formatToCurrency(int $amount, $currency_code, $locale = null,)
+    public function formatToCurrency(int $amount, $currency_code, $locale = null)
     {
         $locale = $this->getEffectiveLocale($locale, false);
 

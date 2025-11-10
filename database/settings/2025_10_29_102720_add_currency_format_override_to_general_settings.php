@@ -8,4 +8,9 @@ return new class extends SettingsMigration
     {
         $this->migrator->add('general.currency_format_override', '');
     }
+
+    public function down(): void
+    {
+        $this->migrator->delete('general.currency_format_override');
+    }
 };
