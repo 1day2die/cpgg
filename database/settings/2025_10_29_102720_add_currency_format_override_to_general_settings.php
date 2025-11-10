@@ -6,6 +6,6 @@ return new class extends SettingsMigration
 {
     public function up(): void
     {
-        $this->migrator->add('general.currency_format_override', 'en');
+        $this->migrator->add('general.currency_format_override', '');
     }
 };

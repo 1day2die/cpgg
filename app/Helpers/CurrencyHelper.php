@@ -11,27 +11,57 @@ class CurrencyHelper
         return $amount / 1000;
     }
 
-    public function formatForDisplay($amount, $decimals = 2, $locale = null, $ignoreOverride = false)
+    /**
+     * Gets the effective locale to use for formatting, considering global overrides.
+     *
+     * @param string|null $locale The requested locale
+     * @param bool $ignoreOverride Whether to ignore the global override setting
+     * @return string The effective locale to use
+     */
+    private function getEffectiveLocale($locale = null, $ignoreOverride = false)
     {
-        $locale = $locale ?: str_replace('_', '-', app()->getLocale());
+        $effectiveLocale = $locale ?: str_replace('_', '-', app()->getLocale());
 
         if (!$ignoreOverride) {
             $override = resolve(\App\Settings\GeneralSettings::class)->currency_format_override ?? null;
-            if ($override) {
-                $locale = $override;
+            if ($override && $override !== '') {
+                $effectiveLocale = $override;
             }
         }
 
+        return $effectiveLocale;
+    }
+
+    /**
+     * Formats a currency amount for display.
+     *
+     * @param mixed $amount The amount to format.
+     * @param int $decimals Number of decimal places to use.
+     * @param string|null $locale The locale to use for formatting (defaults to current application locale).
+     * @param bool $ignoreOverride When true, bypasses the global currency format override setting.
+     * @return string The formatted currency string.
+     */
+    public function formatForDisplay($amount, $decimals = 2, $locale = null, $ignoreOverride = false)
+    {
+        $locale = $this->getEffectiveLocale($locale, $ignoreOverride);
+
         $display = $this->convertForDisplay($amount);
 
+        // Bulgarian ('bg') locale: For numbers <= 9999, use comma as decimal separator and no thousands separator.
+        // This follows common Bulgarian formatting conventions for small numbers, as per CLDR and local usage.
+        // source: https://forum.opencart.com/viewtopic.php?t=144907
         if ($locale === 'bg' && $display <= 9999) {
             return number_format($display, $decimals, ',', '');
         }
 
-        if ($locale === 'es' && $display < 10000) {
+        // Spanish ('es') locale: For numbers <= 9999, use comma as decimal separator and no thousands separator.
+        // This matches Spanish formatting standards for small numbers, as seen in CLDR and government guidelines.
+        if ($locale === 'es' && $display <= 9999) {
             return number_format($display, $decimals, ',', '');
         }
 
+        // Polish ('pl') locale: For numbers <= 9999, use comma as decimal separator and no thousands separator.
+        // This reflects Polish conventions for small numbers, according to CLDR and local financial documents.
         if ($locale === 'pl' && $display <= 9999) {
             return number_format($display, $decimals, ',', '');
         }
@@ -54,13 +84,7 @@ class CurrencyHelper
 
     public function formatToCurrency(int $amount, $currency_code, $locale = null,)
     {
-        $locale = $locale ?: str_replace('_', '-', app()->getLocale());
-
-        // overriding users locale with global override
-        $override = resolve(\App\Settings\GeneralSettings::class)->currency_format_override ?? null;
-        if ($override) {
-            $locale = $override;
-        }
+        $locale = $this->getEffectiveLocale($locale, false);
 
         $formatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
 

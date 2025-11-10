@@ -3,13 +3,13 @@
 namespace App\Settings;
 
 use Spatie\LaravelSettings\Settings;
-
+use App\Helpers\CurrencyHelper;
 class GeneralSettings extends Settings
 {
     public bool $store_enabled = false;
     public ?float $sales_tax = null;
     public string $credits_display_name = 'Credits';
-    public ?string $currency_format_override = 'en';
+    public ?string $currency_format_override = null;
     public ?string $recaptcha_version = null;
     public ?string $recaptcha_site_key = null;
     public ?string $recaptcha_secret_key = null;
@@ -70,11 +70,11 @@ class GeneralSettings extends Settings
     {
         $options = [];
         $locales = config('app.available_locales');
-        $helper = new \App\Helpers\CurrencyHelper();
+        $helper = app(CurrencyHelper::class);
 
         foreach ($locales as $locale) {
             // Format a sample amount (1234.56 in database units = 1234560)
-            $sample = $helper->formatForDisplay(1234560, 2, $locale);
+            $sample = $helper->formatForDisplay(1234560, 2, $locale, true);
             $options[$locale] = "$locale: $sample";
         }
 
