@@ -304,14 +304,16 @@
                                             :class="(product.minimum_credits > user.credits && product.price > user.credits) ||
                                                 product.doesNotFit == true ||
                                                 submitClicked ? 'disabled' : ''"
-                                            class="mt-2 btn btn-primary btn-block" @click="setProduct(product.id);"
-                                                x-text="product.doesNotFit == true
-                                                    ? '{{ __('Server cant fit on this Location') }}'
-                                                    : (product.servers_count >= product.serverlimit && product.serverlimit != 0
-                                                        ? '{{ __('Max. Servers with configuration reached') }}'
-                                                        : (product.minimum_credits > user.credits && product.price > user.credits
-                                                            ? '{{ __('Not enough') }} {{ $credits_display_name }}!'
-                                                            : '{{ __('Create server') }}'))">                                        </button>
+                                            class="mt-2 btn btn-primary btn-block"
+                                            @click="submitClicked = true; setProduct(product.id);"
+                                            x-text="product.doesNotFit == true
+                                                ? '{{ __('Server cant fit on this Location') }}'
+                                                : (product.servers_count >= product.serverlimit && product.serverlimit != 0
+                                                    ? '{{ __('Max. Servers with configuration reached') }}'
+                                                    : (product.minimum_credits > user.credits && product.price > user.credits
+                                                        ? '{{ __('Not enough') }} {{ $credits_display_name }}!'
+                                                        : '{{ __('Create server') }}'))">
+                                        </button>
                                         @if (env('APP_ENV') == 'local' || $store_enabled)
                                         <template x-if="product.price > user.credits || product.minimum_credits > user.credits">
                                             <a href="{{ route('store.index') }}">
