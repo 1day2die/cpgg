@@ -120,7 +120,7 @@ class UserController extends Controller
                         ];
                     } else {
                         $allReferrals[] = (object)[
-                            'id' => null,
+                            'id' => 'N/A',
                             'name' => 'Unknown (deleted)',
                             'created_at' => \Carbon\Carbon::parse($referral->created_at),
                             'deleted' => true,

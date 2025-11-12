@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration {
     /**
@@ -35,6 +36,10 @@ return new class extends Migration {
         Schema::table('user_referrals', function (Blueprint $table) {
             $table->dropForeign(['referral_id']);
             $table->dropForeign(['registered_user_id']);
+
+            // Clean up any NULL values that may exist due to set null on delete
+            DB::table('user_referrals')->whereNull('referral_id')->orWhereNull('registered_user_id')->delete();
+
             $table->unsignedBigInteger('referral_id')->nullable(false)->change();
             $table->unsignedBigInteger('registered_user_id')->nullable(false)->change();
             $table->foreign('referral_id')->references('id')->on('users')->onDelete('cascade');
