@@ -47,25 +47,13 @@ class CurrencyHelper
 
         $display = $this->convertForDisplay($amount);
 
-        // Bulgarian ('bg') locale: For numbers <= 9999, use comma as decimal separator and no thousands separator.
-        // This follows common Bulgarian formatting conventions for small numbers, as per CLDR and local usage.
+        // For Bulgarian ('bg'), Spanish ('es'), and Polish ('pl') locales: For numbers <= 9999, use comma as decimal separator and no thousands separator.
+        // This follows common formatting conventions for small numbers in these locales, as per CLDR and local usage.
         // source: https://forum.opencart.com/viewtopic.php?t=144907
-        if ($locale === 'bg' && $display <= 9999) {
+        $specialLocales = ['bg', 'es', 'pl'];
+        if (in_array($locale, $specialLocales, true) && $display <= 9999) {
             return number_format($display, $decimals, ',', '');
         }
-
-        // Spanish ('es') locale: For numbers <= 9999, use comma as decimal separator and no thousands separator.
-        // This matches Spanish formatting standards for small numbers, as seen in CLDR and government guidelines.
-        if ($locale === 'es' && $display <= 9999) {
-            return number_format($display, $decimals, ',', '');
-        }
-
-        // Polish ('pl') locale: For numbers <= 9999, use comma as decimal separator and no thousands separator.
-        // This reflects Polish conventions for small numbers, according to CLDR and local financial documents.
-        if ($locale === 'pl' && $display <= 9999) {
-            return number_format($display, $decimals, ',', '');
-        }
-
         $formatter = new NumberFormatter($locale, NumberFormatter::DECIMAL);
         $formatter->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $decimals);
         $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $decimals);
