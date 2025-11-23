@@ -210,9 +210,7 @@ class NotifyServerSuspension extends Command
      */
     private function hasInsufficientCredits($user, $product)
     {
-        $userCredits = $this->currencyHelper->formatForCommands($user->credits);
-        $serverPrice = $this->currencyHelper->formatForCommands($product->price);
-
-        return $userCredits < $serverPrice && $serverPrice != 0;
+        // Direct integer comparison; both values are in thousandths
+        return $user->credits < $product->price && $product->price != 0;
     }
 }
