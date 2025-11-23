@@ -54,8 +54,8 @@ class ServerSuspensionWarningNotification extends Notification
         });
         $serverList = $sortedServers->map(function ($serverData, $index) {
             $server = $serverData['server'];
-            return $server->name . ' (will be suspended on ' . $serverData['suspension_date']->format('M j, Y \a\t g:i A') . ')';
-        })->implode(', ');
+            return '• ' . $server->name . ' (will be suspended on ' . $serverData['suspension_date']->format('M j, Y \a\t g:i A') . ')';
+        })->implode("\n");
 
         $currentCredits = app(CurrencyHelper::class)->formatForDisplay($notifiable->credits);
         $totalNeededDisplay = app(CurrencyHelper::class)->formatForDisplay($totalCreditsNeeded);
