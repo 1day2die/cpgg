@@ -18,6 +18,14 @@
                 </div>
             </div>
         </div>
+        @if (!empty($headFileMissing) && $headFileMissing && Auth::user()->hasRole('Admin'))
+            <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+                <strong>Warning:</strong> The <code>.git/HEAD</code> file is missing. Please restore it if possible to ensure correct version and branch information.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
         @if(Storage::get('latestVersion') && config("app.version") < Storage::get('latestVersion'))
             <div class="alert alert-danger" role="alert">
                 <b><i class="fas fa-shield-alt"></i> {{__("Version Outdated:")}}</b></br>

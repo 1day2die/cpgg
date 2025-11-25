@@ -22,7 +22,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\CausesActivity;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
-
+use Spatie\Activitylog\Models\Activity;
 /**
  * Class User
  */
@@ -157,7 +157,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return Attribute::make(
             // We only convert when the user already exists, to avoid 2 conversions.
-            set: fn ($value) => $this->exists ? Currency::prepareForDatabase($value) : $value,
+            set: fn($value) => $this->exists ? Currency::prepareForDatabase($value) : $value,
         );
     }
 
@@ -209,6 +209,19 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Coupon::class, 'user_coupons');
     }
 
+    // tap into activity log to convert db value to display value
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        if (($eventName === 'deleted' || $eventName === 'created') && $activity->properties->has('attributes')) {
+            $attributes = $activity->properties->get('attributes');
+            if (isset($attributes['credits'])) {
+                $attributes['credits'] = Currency::formatForDisplay($attributes['credits']);
+                $activity->properties->put('attributes', $attributes);
+            }
+        }
+
+    }
+
     /**
      * @return HasOne
      */
@@ -233,7 +246,7 @@ class User extends Authenticatable implements MustVerifyEmail
             if (!$executed) {
                 return redirect()->back()->with('error', 'Too many requests. Try again in ' . RateLimiter::availableIn('verify-mail:' . $this->id) . ' seconds.');
             }
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             Log::error($exception->getMessage());
             return redirect()->back()->with('error', __("Something went wrong. Please try again later!"));
         }
