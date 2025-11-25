@@ -169,13 +169,13 @@ class CouponController extends Controller
         $random_codes_amount = $request->input('range_codes');
         $rules = [
             "type" => "required|string|in:percentage,amount",
-            // Accept -1 for unlimited uses, or between 1 and 100 digits
+            // Maximum number of uses that a user can make of the same coupon. Set to -1 for unlimited uses per user, or between 1 and 100 digits.
             "max_uses" => [
                 'required',
                 'integer',
                 function ($attribute, $value, $fail) {
                     if ($value != -1 && ($value <= 0 || strlen((string) $value) > 100)) {
-                        $fail(__('Max uses must be -1 for unlimited or a positive integer with at most 100 digits.'));
+                        $fail(__('Maximum number of uses that a user can make of the same coupon. Set to -1 for unlimited uses per user, or a positive integer with at most 100 digits.'));
                     }
                 }
             ],
