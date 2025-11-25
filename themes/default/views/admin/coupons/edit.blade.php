@@ -182,6 +182,7 @@
                                 type="number"
                                 step="any"
                                 min="-1"
+                                max="999999999"
                                 class="form-control @error('max_uses') is-invalid @enderror"
                                 value="{{ $coupon->max_uses }}"
                               >
