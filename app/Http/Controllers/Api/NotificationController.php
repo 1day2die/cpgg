@@ -17,9 +17,6 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Exception;
 
-/**
- * @group Notification Management
- */
 class NotificationController extends Controller
 {
     public function __construct(protected NotificationService $notificationService)

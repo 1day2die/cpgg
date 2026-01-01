@@ -13,9 +13,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * @group Role Management
- */
 class RoleController extends Controller
 {
     const ALLOWED_INCLUDES = ['permissions', 'users'];
@@ -23,11 +20,6 @@ class RoleController extends Controller
 
     /**
      * Show a list of roles.
-     * 
-     * @queryParam include string Comma-separated list of related resources to include. Example: permissions,users
-     * @queryParam filter[name] string Filter by role name. Example: Admin
-     * @queryParam per_page integer Number of items per page (default: 50). Example: 25
-     * @queryParam page integer Page number. Example: 1
      *
      * @param Request $request
      * @return RoleResource

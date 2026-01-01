@@ -36,22 +36,4 @@ class CreateServerRequest extends FormRequest
             'billing_priority' => ['nullable', Rule::enum(BillingPriority::class)],
         ];
     }
-
-    /**
-     * Get the body parameters for the request documentation.
-     * Document only the “egg_variables” parameter as it is the only one that requires additional context.
-     *
-     * @return void
-     */
-    public function bodyParameters()
-    {
-        return [
-            'egg_variables' => [
-                'description' => 'The server deployment variables. These are specific to the selected egg.',
-                'example' => '{
-                    "VARIABLE_NAME": "value"
-                }',
-            ],
-        ];
-    }
 }

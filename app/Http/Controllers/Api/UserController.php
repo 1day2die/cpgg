@@ -26,9 +26,6 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * @group User Management
- */
 class UserController extends Controller
 {
     use Referral;
@@ -49,15 +46,6 @@ class UserController extends Controller
 
     /**
      * Show a list of users.
-     * 
-     * @queryParam include string Comma-separated list of related resources to include. Example: servers.product,notifications,payments,vouchers.users,roles.permissions,discordUser
-     * @queryParam filter[name] string Filter by user name. Example: John Doe
-     * @queryParam filter[server_limit] integer Filter by server limit. Example: 5
-     * @queryParam filter[email] string Filter by user email. Example: john@example.com
-     * @queryParam filter[pterodactyl_id] string Filter by Pterodactyl ID. Example: 456
-     * @queryParam filter[suspended] boolean Filter by suspended status. Example: true
-     * @queryParam per_page integer Number of items per page (default: 50). Example: 25
-     * @queryParam page integer Page number. Example: 1
      *
      * @param  Request  $request
      * @return UserResource

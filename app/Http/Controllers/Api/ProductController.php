@@ -11,9 +11,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
-/**
- * @group Product Management
- */
 class ProductController extends Controller
 {
     const ALLOWED_INCLUDES = ['servers.user', 'eggs.nest', 'nodes.location'];
@@ -21,13 +18,6 @@ class ProductController extends Controller
 
     /**
      * Show a list of products.
-     * 
-     * @queryParam include string Comma-separated list of related resources to include. Example: servers.user,eggs.nest,nodes.location
-     * @queryParam filter[name] string Filter by product name. Example: Starter
-     * @queryParam filter[description] string Filter by product description. Example: Basic hosting plan
-     * @queryParam filter[price] numeric Filter by product price. Example: 250
-     * @queryParam per_page integer Number of items per page (default: 50). Example: 25
-     * @queryParam page integer Page number. Example: 1
      * 
      * @param Request $request
      * @return ProductResource
