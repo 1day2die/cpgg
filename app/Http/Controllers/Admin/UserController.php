@@ -85,54 +85,18 @@ class UserController extends Controller
     {
         $this->checkPermission(self::READ_PERMISSION);
 
-        $referralRecords = DB::table('user_referrals')->where('referral_id', '=', $user->id)->get();
-        $allReferrals = [];
-
-        foreach ($referralRecords as $referral) {
-            $deleted = $referral->deleted_at !== null;
-
-            if ($deleted) {
-                $deletedId = $referral->deleted_user_id;
-                $name = $referral->deleted_username ? $referral->deleted_username . ' (deleted)' : 'Deleted User';
-
-                $allReferrals[] = (object)[
-                    'id' => $deletedId,
-                    'name' => $name,
-                    'created_at' => \Carbon\Carbon::parse($referral->created_at),
-                    'deleted' => true,
-                ];
-            } else {
-                $userObj = User::query()->find($referral->registered_user_id);
-                if ($userObj) {
-                    $allReferrals[] = (object)[
-                        'id' => $userObj->id,
-                        'name' => $userObj->name,
-                        'created_at' => $userObj->created_at,
-                        'deleted' => false,
-                    ];
-                } else {
-                    if ($referral->deleted_user_id) {
-                        $allReferrals[] = (object)[
-                            'id' => $referral->deleted_user_id,
-                            'name' => ($referral->deleted_username ? $referral->deleted_username . ' (deleted)' : 'Deleted User'),
-                            'created_at' => \Carbon\Carbon::parse($referral->created_at),
-                            'deleted' => true,
-                        ];
-                    } else {
-                        $allReferrals[] = (object)[
-                            'id' => 'N/A',
-                            'name' => 'Unknown (deleted)',
-                            'created_at' => \Carbon\Carbon::parse($referral->created_at),
-                            'deleted' => true,
-                        ];
-                    }
-                }
-            }
+        //QUERY ALL REFERRALS A USER HAS
+        //i am not proud of this at all.
+        $allReferals = [];
+        $referrals = DB::table('user_referrals')->where('referral_id', '=', $user->id)->get();
+        foreach ($referrals as $referral) {
+            array_push($allReferals, $allReferals['id'] = User::query()->findOrFail($referral->registered_user_id));
         }
+        array_pop($allReferals);
 
         return view('admin.users.show')->with([
             'user' => $user,
-            'referrals' => $allReferrals,
+            'referrals' => $allReferals,
             'locale_datatables' => $locale_settings->datatables,
             'credits_display_name' => $general_settings->credits_display_name
         ]);
@@ -367,7 +331,7 @@ class UserController extends Controller
     {
         $this->checkPermission(self::NOTIFY_PERMISSION);
 
-        //TODO: reimplement the required validation on all,users and roles . didnt work -- required_without:users,roles
+//TODO: reimplement the required validation on all,users and roles . didnt work -- required_without:users,roles
         $data = $request->validate([
             'via' => 'required|min:1|array',
             'via.*' => 'required|string|in:mail,database',

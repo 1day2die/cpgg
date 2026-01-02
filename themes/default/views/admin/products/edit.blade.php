@@ -58,7 +58,7 @@
                                                 class="fas fa-info-circle"></i></label>
                                     </div>
                                 </div>
-
+                                
                                 <div class="row">
                                     <div class="col-lg-12">
                                         <div class="form-group">
@@ -96,7 +96,7 @@
                                                     data-toggle="popover" data-trigger="hover"
                                                     data-content="{{ __('Period when the user will be charged for the given price') }}"
                                                     class="fas fa-info-circle"></i></label>
-
+    
                                             <select id="billing_period" style="width:100%" class="custom-select"
                                                 name="billing_period" required autocomplete="off"
                                                 @error('billing_period') is-invalid @enderror>
@@ -194,9 +194,8 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="cpu">{{ __('Cpu') }}</label>
-                                            <input value="{{ $product->cpu }}" id="cpu" name="cpu" type="number" min="0"
+                                            <input value="{{ $product->cpu }}" id="cpu" name="cpu" type="number"
                                                 class="form-control @error('cpu') is-invalid @enderror" required="required">
-                                            <div class="text-muted small">{{ __('Set to 0 for Unlimited') }}</div>
                                             @error('cpu')
                                                 <div class="invalid-feedback">
                                                     {{ $message }}
@@ -208,9 +207,8 @@
                                         <div class="form-group">
                                             <label for="disk">{{ __('Disk') }}</label>
                                             <input value="{{ $product->disk }}" id="disk" name="disk"
-                                                type="number" min="0" class="form-control @error('disk') is-invalid @enderror"
+                                                type="number" class="form-control @error('disk') is-invalid @enderror"
                                                 required="required">
-                                            <div class="text-muted small">{{ __('Set to 0 for Unlimited') }}</div>
                                             @error('disk')
                                                 <div class="invalid-feedback">
                                                     {{ $message }}
@@ -224,9 +222,8 @@
                                         <div class="form-group">
                                             <label for="memory">{{ __('Memory') }}</label>
                                             <input value="{{ $product->memory }}" id="memory" name="memory"
-                                                type="number" min="0" class="form-control @error('memory') is-invalid @enderror"
+                                                type="number" class="form-control @error('memory') is-invalid @enderror"
                                                 required="required">
-                                            <div class="text-muted small">{{ __('Set to 0 for Unlimited') }}</div>
                                             @error('memory')
                                                 <div class="invalid-feedback">
                                                     {{ $message }}
@@ -255,7 +252,6 @@
                                             <input value="{{ $product->swap }}" id="swap" name="swap"
                                                 type="number" class="form-control @error('swap') is-invalid @enderror"
                                                 required="required">
-                                              <div class="text-muted small">{{ __('Set to -1 for Unlimited') }}</div>
                                             @error('swap')
                                                 <div class="invalid-feedback">
                                                     {{ $message }}
@@ -328,7 +324,7 @@
                                 <div class="row">
 									<div class="col-lg-6">
 										<div class="form-group">
-                                            <input type="checkbox" value="1" id="oom_killer" name="oom_killer" @if($product->oom_killer) checked @endif>
+											<input type="checkbox" value="1" id="oom_killer" name="oom_killer">
 											<label for="oom_killer">
                                                 {{ __('OOM Killer') }}
                                                 <i data-toggle="popover"
