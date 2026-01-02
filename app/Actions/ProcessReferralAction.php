@@ -11,26 +11,19 @@ use Illuminate\Support\Facades\DB;
 
 class ProcessReferralAction
 {
-    protected ReferralSettings $referralSettings;
-    protected GeneralSettings $generalSettings;
-    protected CurrencyHelper $currencyHelper;
-
-    /**
-     * Create a new class instance.
-     */
-    public function __construct()
-    {
-        $this->referralSettings = app(ReferralSettings::class);
-        $this->generalSettings = app(GeneralSettings::class);
-        $this->currencyHelper = app(CurrencyHelper::class);
-    }
+    public function __construct(
+        protected ReferralSettings $referralSettings,
+        protected GeneralSettings $generalSettings,
+        protected CurrencyHelper $currencyHelper,
+    )
+    {}
 
     public function execute(User $user, string $referral_code, bool $log_activity = false)
     {
         $ref_user = User::query()->where('referral_code', $referral_code)->first();
 
         if ($ref_user) {
-            if ($this->referralSettings->mode == 'sign-up' || $this->referralSettings->mode == 'both') {
+            if ($this->referralSettings->mode === 'sign-up' || $this->referralSettings->mode === 'both') {
                 $ref_user->increment('credits', $this->referralSettings->reward);
                 $ref_user->notify(new ReferralNotification($user));
 

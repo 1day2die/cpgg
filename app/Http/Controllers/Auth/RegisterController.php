@@ -24,14 +24,6 @@ use Spatie\Permission\Models\Role;
 
 class RegisterController extends Controller
 {
-    private PterodactylSettings $pterodactylSettings;
-    private PterodactylClient $pterodactylClient;
-    private CurrencyHelper $currencyHelper;
-    private GeneralSettings $generalSettings;
-    private WebsiteSettings $websiteSettings;
-    private UserSettings $userSettings;
-    private ReferralSettings $referralSettings;
-
     /*
     |--------------------------------------------------------------------------
     | Register Controller
@@ -57,17 +49,25 @@ class RegisterController extends Controller
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct(
+        protected PterodactylSettings $pterodactylSettings,
+        protected CurrencyHelper $currencyHelper,
+        protected GeneralSettings $generalSettings,
+        protected WebsiteSettings $websiteSettings,
+        protected UserSettings $userSettings,
+        protected ReferralSettings $referralSettings,
+        protected PterodactylClient $pterodactylClient,
+        private ProcessReferralAction $processReferralAction,
+    ) {
         $this->middleware('guest');
-
-        $this->pterodactylSettings = app(PterodactylSettings::class);
-        $this->pterodactylClient = app(PterodactylClient::class, [$this->pterodactylSettings]);
-        $this->currencyHelper = app(CurrencyHelper::class);
-        $this->generalSettings = app(GeneralSettings::class);
-        $this->websiteSettings = app(WebsiteSettings::class);
-        $this->userSettings = app(UserSettings::class);
-        $this->referralSettings = app(ReferralSettings::class);
+        $this->pterodactylSettings = $pterodactylSettings;
+        $this->pterodactylClient = new PterodactylClient($pterodactylSettings);
+        $this->currencyHelper = $currencyHelper;
+        $this->generalSettings = $generalSettings;
+        $this->websiteSettings = $websiteSettings;
+        $this->userSettings = $userSettings;
+        $this->referralSettings = $referralSettings;
+        $this->processReferralAction = $processReferralAction;
     }
 
     /**
@@ -163,8 +163,8 @@ class RegisterController extends Controller
 
         $user->syncRoles(Role::findById(4));
 
-        if (isset($data['referral_code'])) {
-            (new ProcessReferralAction)->execute($user, $data['referral_code'], true);
+        if (!empty($data['referral_code'])) {
+            $this->processReferralAction->execute($user, $data['referral_code'], true);
         }
 
         return $user;
