@@ -407,7 +407,7 @@ class ServerController extends Controller
 
         //$currentProductEggs = $currentProduct->eggs->pluck('id')->toArray();
 
-        return Product::orderBy('created_at')
+        return Product::orderBy('price', 'asc')
             ->with('nodes')->with('eggs')
             ->whereHas('nodes', function (Builder $builder) use ($nodeId) {
                 $builder->where('id', $nodeId);
