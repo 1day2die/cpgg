@@ -261,7 +261,7 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label for="serverlimit">{{ __('Serverlimit') }}</label>
+                                            <label for="serverlimit">{{ __('Server limit') }}</label>
                                             <i data-toggle="popover" data-trigger="hover"
                                             data-content="{{ __('The maximum amount of Servers that can be created with this Product per User. 0 = unlimited') }}"
                                             class="fas fa-info-circle"></i>
