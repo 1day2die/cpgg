@@ -257,7 +257,7 @@
 									</div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label for="serverlimit">{{ __('Serverlimit') }}</label>
+                                            <label for="serverlimit">{{ __('Server limit') }}</label>
                                             <i
                                                 data-toggle="popover"
                                                 data-trigger="hover"
