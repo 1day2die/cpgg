@@ -385,7 +385,7 @@ class UserController extends Controller
             try {
                 $user->notify(new DynamicNotification($data['via'], $database, $mail));
                 $successCount++;
-            } catch (Exception $e) {
+            } catch (\Throwable $e)
                 Log::error('Mass notification error for user ' . $user->id . ': ' . $e->getMessage());
             }
         }
