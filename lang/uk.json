@@ -138,7 +138,7 @@
     "Count": "Всього",
     "Locations": "Локації",
     "Eggs": "Яйця",
-    "Last updated :date": "Останнє оновлення: {date}",
+    "Last updated :date": "Останнє оновлення: :date",
     "Download all Invoices": "Отримати рахунок на оплату",
     "Product Price": "Ціна товару",
     "Tax Value": "Податок",
