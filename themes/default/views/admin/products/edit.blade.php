@@ -34,7 +34,7 @@
 
                         @if ($product->servers()->count() > 0)
                             <div class="callout callout-danger">
-                                <h4>{{ __('Editing the resource options will not automatically update the servers on pterodactyls side! ') }}</h4>
+                                <h4>{{ __('Editing the resource options will not automatically update the servers on pterodactyls side!') }}</h4>
                             </div>
                         @endif
 
@@ -160,7 +160,7 @@
                                         <div class="form-group">
                                             <label for="price">{{ __('Price in') }} {{ $credits_display_name }}</label>
                                             <input value="{{ Currency::formatForForm($product->price) }}" id="price" name="price"
-                                                type="number" step=". 0001"
+                                                type="number" step=".0001"
                                                 class="form-control @error('price') is-invalid @enderror"
                                                 required="required">
                                             @error('price')
@@ -174,9 +174,9 @@
                                         <div class="form-group">
                                             <label for="minimum_credits">{{ __('Minimum') }} {{ $credits_display_name }}
                                                 <i data-toggle="popover" data-trigger="hover"
-                                                    data-content="{{ __('Setting to empty will use the value from configuration. ') }}"
+                                                    data-content="{{ __('Setting to empty will use the value from configuration.') }}"
                                                     class="fas fa-info-circle"></i></label>
-                                            <input value="{{ $product->minimum_credits ?  Currency::formatForForm($product->minimum_credits) : null }}" id="minimum_credits"
+                                            <input value="{{ $product->minimum_credits ? Currency::formatForForm($product->minimum_credits) : null }}" id="minimum_credits"
                                                 name="minimum_credits" type="number"
                                                 class="form-control @error('minimum_credits') is-invalid @enderror">
                                             @error('minimum_credits')
@@ -260,9 +260,9 @@
                                         <div class="form-group">
                                             <label for="serverlimit">{{ __('Server limit') }}</label>
                                             <i data-toggle="popover" data-trigger="hover"
-                                            data-content="{{ __('The maximum amount of Servers that can be created with this Product per User.  0 = unlimited') }}"
+                                            data-content="{{ __('The maximum amount of Servers that can be created with this Product per User. 0 = unlimited') }}"
                                             class="fas fa-info-circle"></i>
-                                            <input value="{{ $product->serverlimit ??  0 }}"
+                                            <input value="{{ $product->serverlimit ?? 0 }}"
                                                 id="serverlimit" name="serverlimit" type="number"
                                                 class="form-control @error('serverlimit') is-invalid @enderror"
                                                 required="required">
@@ -278,7 +278,7 @@
                                     <div class="col-lg-4">
                                         <div class="form-group">
                                             <label for="allocations">{{ __('Allocations') }}</label>
-                                            <input value="{{ $product->allocations ??  (old('allocations') ?? 0) }}"
+                                            <input value="{{ $product->allocations ?? (old('allocations') ?? 0) }}"
                                                 id="allocations" name="allocations" type="number"
                                                 class="form-control @error('allocations') is-invalid @enderror"
                                                 required="required">
@@ -321,7 +321,7 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <input type="checkbox" value="1" id="oom_killer" name="oom_killer">
+                                            <input type="checkbox" value="1" id="oom_killer" name="oom_killer" @if ($product->oom_killer) checked @endif>
                                             <label for="oom_killer">
                                                 {{ __('OOM Killer') }}
                                                 <i data-toggle="popover"
@@ -426,27 +426,35 @@
                 closeOnSelect: false
             });
 
+            // Logic to select all items in a group when the group label is clicked
             $(document).on('click', '.select2-results__group', function(e) {
                 const nestLabel = $(this).text().trim();
                 const $select = $('#eggs');
                 const allOptions = $select.find('option');
 
+                // Find all options that belong to this group (optgroup)
                 const groupOptions = allOptions.filter(function() {
                     const $this = $(this);
                     const $group = $this.closest('optgroup');
                     return $group.length && $group.attr('label') === nestLabel;
                 });
 
-                const allSelected = groupOptions. length > 0 && groupOptions.length === groupOptions.filter(':selected').length;
+                // Check if all are already selected
+                const allSelected = groupOptions.length > 0 && groupOptions.length === groupOptions.filter(':selected').length;
 
+                // Toggle selection
                 groupOptions.prop('selected', !allSelected);
+
+                // Trigger change to update Select2 visuals
                 $select.trigger('change');
 
+                // Optional: Select2 usually closes on selection, we might want to keep it open or let it close.
+                // Preventing default keeps the dropdown open if necessary, but Select2 rebuilds DOM on change.
                 e.stopPropagation();
                 return false;
             });
 
-            document. getElementById('select-all-eggs').addEventListener('click', function(e) {
+            document.getElementById('select-all-eggs').addEventListener('click', function(e) {
                 e.preventDefault();
                 $('#eggs option').prop('selected', true);
                 $('#eggs').trigger('change');
