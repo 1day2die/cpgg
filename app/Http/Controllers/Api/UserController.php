@@ -209,7 +209,7 @@ class UserController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return bool
+     * @return User
      *
      * @throws ValidationException
      */
@@ -217,13 +217,21 @@ class UserController extends Controller
     {
         $discordUser = DiscordUser::find($id);
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
+        $reason = $request->input('reason', null);
 
         if ($user->isSuspended()) {
             throw ValidationException::withMessages([
                 'error' => 'The user is already suspended',
             ]);
         }
+        
         $user->suspend();
+
+        $logMessage = "The user " . $user->name . " (ID: " . $user->id . ") was suspended via API";
+        if ($reason) {
+            $logMessage .= ". Reason: " . e($reason);
+        }
+        activity()->performedOn($user)->log($logMessage);
 
         return $user;
     }
@@ -233,7 +241,7 @@ class UserController extends Controller
      *
      * @param  Request  $request
      * @param  int  $id
-     * @return bool
+     * @return User
      *
      * @throws ValidationException
      */
@@ -241,6 +249,7 @@ class UserController extends Controller
     {
         $discordUser = DiscordUser::find($id);
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
+        $reason = $request->input('reason', null);
 
         if (! $user->isSuspended()) {
             throw ValidationException::withMessages([
@@ -249,6 +258,12 @@ class UserController extends Controller
         }
 
         $user->unSuspend();
+
+        $logMessage = "The user " . $user->name . " (ID: " . $user->id . ") was unsuspended via API";
+        if ($reason) {
+            $logMessage .= ". Reason: " . e($reason);
+        }
+        activity()->performedOn($user)->log($logMessage);
 
         return $user;
     }
