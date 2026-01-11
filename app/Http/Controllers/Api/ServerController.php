@@ -64,16 +64,25 @@ class ServerController extends Controller
     /**
      * suspend server
      *
+     * @param  Request  $request
      * @param  Server  $server
      * @return Server|JsonResponse
      */
-    public function suspend(Server $server)
+    public function suspend(Request $request, Server $server)
     {
+        $reason = $request->input('reason', null);
+
         try {
             $server->suspend();
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
+
+        $logMessage = "The server with ID: " . $server->id . " was suspended via API";
+        if ($reason) {
+            $logMessage .= ". Reason: " . e($reason);
+        }
+        activity()->performedOn($server)->log($logMessage);
 
         return $server->load('product');
     }
