@@ -90,16 +90,25 @@ class ServerController extends Controller
     /**
      * unsuspend server
      *
+     * @param  Request  $request
      * @param  Server  $server
      * @return Server|JsonResponse
      */
-    public function unSuspend(Server $server)
+    public function unSuspend(Request $request, Server $server)
     {
+        $reason = $request->input('reason', null);
+
         try {
             $server->unSuspend();
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
+
+        $logMessage = "The server with ID: " . $server->id . " was unsuspended via API";
+        if ($reason) {
+            $logMessage .= ". Reason: " . e($reason);
+        }
+        activity()->performedOn($server)->log($logMessage);
 
         return $server->load('product');
     }
