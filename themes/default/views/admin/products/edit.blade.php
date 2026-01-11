@@ -303,6 +303,17 @@
         </div>
     </section>
 
+    <style>
+        .select2-results__group {
+            cursor: pointer !important;
+            transition: background-color 0.2s;
+        }
+        .select2-results__group:hover {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+    </style>
+
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             $('[data-toggle="popover"]').popover();
