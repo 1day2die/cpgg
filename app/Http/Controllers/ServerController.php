@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
+use Illuminate\Support\Facades\Cache;
 
 class ServerController extends Controller
 {
@@ -111,8 +112,17 @@ class ServerController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        // Anti-Spam: Make sure the user didnt somehow spam-create servers
+        $lastServerCreation = session('last_server_creation');
+        if ($lastServerCreation && (time() - $lastServerCreation < 10)) {
+            return redirect()->route('servers.index')
+                ->with('error', __('Please wait a few Seconds before creating a new Server.'));
+        }
+        session(['last_server_creation' => time()]);
+
         $validationResult = $this->validateServerCreation($request);
-        if ($validationResult) return $validationResult;
+        if ($validationResult)
+            return $validationResult;
 
         $request->validate([
             'name' => 'required|max:191',
@@ -212,7 +222,8 @@ class ServerController extends Controller
 
         foreach ($servers as $server) {
             $serverInfo = $this->pterodactyl->getServerAttributes($server->pterodactyl_id);
-            if (!$serverInfo) continue;
+            if (!$serverInfo)
+                continue;
 
             $this->updateServerInfo($server, $serverInfo);
         }
@@ -260,7 +271,8 @@ class ServerController extends Controller
         $egg = $product->eggs()->findOrFail($request->input('egg'));
         $node = $this->findAvailableNode($request->input('location'), $product);
 
-        if (!$node) return null;
+        if (!$node)
+            return null;
 
         $server = $request->user()->servers()->create([
             'name' => $request->input('name'),
@@ -305,8 +317,10 @@ class ServerController extends Controller
 
         $user->decrement('credits', $server->product->price);
 
+        Cache::forget('user_credits_left:' . $user->id);
         try {
-            if ($this->discordSettings->role_for_active_clients &&
+            if (
+                $this->discordSettings->role_for_active_clients &&
                 $user->discordUser &&
                 $user->servers->count() >= 1
             ) {
@@ -362,6 +376,7 @@ class ServerController extends Controller
         }
 
         $server->delete();
+        Cache::forget('user_credits_left:' . $server->user_id);
     }
 
     public function cancel(Server $server): RedirectResponse
@@ -425,8 +440,10 @@ class ServerController extends Controller
                 $maxMemory = ($pteroNode['memory'] * ($pteroNode['memory_overallocate'] + 100) / 100);
                 $maxDisk = ($pteroNode['disk'] * ($pteroNode['disk_overallocate'] + 100) / 100);
 
-                if ($memoryDiff > $maxMemory - $pteroNode['allocated_resources']['memory'] ||
-                    $diskDiff > $maxDisk - $pteroNode['allocated_resources']['disk']) {
+                if (
+                    $memoryDiff > $maxMemory - $pteroNode['allocated_resources']['memory'] ||
+                    $diskDiff > $maxDisk - $pteroNode['allocated_resources']['disk']
+                ) {
                     $product->doesNotFit = true;
                 }
 
