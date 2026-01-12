@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
-use Illuminate\Support\Facades\Cache; // Импортируем Cache
+use Illuminate\Support\Facades\Cache;
 
 class ServerController extends Controller
 {
@@ -113,17 +113,12 @@ class ServerController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        // ----------------------------------------------------
-        // FIX: Блокировка дублирующих запросов (Debounce)
-        // ----------------------------------------------------
         $lockKey = 'server_create_lock_' . Auth::id();
         if (Cache::has($lockKey)) {
             return redirect()->route('servers.index')
                 ->with('error', __('Please wait a moment before creating another server.'));
         }
-        // Блокируем создание серверов для этого пользователя на 5 секунд
         Cache::put($lockKey, true, 5);
-        // ----------------------------------------------------
 
         $validationResult = $this->validateServerCreation($request);
         if ($validationResult) return $validationResult;
