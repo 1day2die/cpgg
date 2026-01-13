@@ -41,12 +41,12 @@ class ServerController extends Controller
      */
     public function destroy(Request $request, Server $server)
     {
-        $reason = $request->input('reason', null);
-        
-        if ($reason) {
-            $reason = mb_substr($reason, 0, 320);
-        }
+        $request->validate([
+            'reason' => 'sometimes|string|max:320',
+        ]);
 
+        $reason = $request->input('reason');
+        
         $logMessage = "The server with ID: " . $server->id . " was deleted via API";
         
         if ($reason) {
@@ -62,11 +62,11 @@ class ServerController extends Controller
 
     public function suspend(Request $request, Server $server)
     {
-        $reason = $request->input('reason', null);
+        $request->validate([
+            'reason' => 'sometimes|string|max:320',
+        ]);
 
-        if ($reason) {
-            $reason = mb_substr($reason, 0, 320);
-        }
+        $reason = $request->input('reason');
 
         try {
             $server->suspend();
@@ -85,11 +85,11 @@ class ServerController extends Controller
 
     public function unSuspend(Request $request, Server $server)
     {
-        $reason = $request->input('reason', null);
+        $request->validate([
+            'reason' => 'sometimes|string|max:320',
+        ]);
 
-        if ($reason) {
-            $reason = mb_substr($reason, 0, 320);
-        }
+        $reason = $request->input('reason');
 
         try {
             $server->unSuspend();
