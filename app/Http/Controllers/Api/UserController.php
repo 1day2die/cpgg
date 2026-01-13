@@ -198,11 +198,11 @@ class UserController extends Controller
         $discordUser = DiscordUser::find($id);
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
         
-        $reason = $request->input('reason', null);
-
-        if ($reason) {
-            $reason = mb_substr($reason, 0, 320);
-        }
+        $request->validate([
+            'reason' => 'sometimes|string|max:320',
+        ]);
+        
+        $reason = $request->input('reason');
 
         if ($user->isSuspended()) {
             throw ValidationException::withMessages([
@@ -228,11 +228,11 @@ class UserController extends Controller
         $discordUser = DiscordUser::find($id);
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
         
-        $reason = $request->input('reason', null);
-
-        if ($reason) {
-            $reason = mb_substr($reason, 0, 320);
-        }
+        $request->validate([
+            'reason' => 'sometimes|string|max:320',
+        ]);
+        
+        $reason = $request->input('reason');
 
         if (! $user->isSuspended()) {
             throw ValidationException::withMessages([
@@ -259,11 +259,11 @@ class UserController extends Controller
         $discordUser = DiscordUser::find($id);
         $user = $discordUser ? $discordUser->user : User::findOrFail($id);
         
-        $reason = $request->input('reason', null);
-
-        if ($reason) {
-            $reason = mb_substr($reason, 0, 320);
-        }
+        $request->validate([
+            'reason' => 'sometimes|string|max:320',
+        ]);
+        
+        $reason = $request->input('reason');
 
         $logMessage = "The user " . $user->name . " (ID: " . $user->id . ") was deleted via API";
         if ($reason) {
