@@ -60,6 +60,7 @@ class Server extends Model
         "billing_priority",
         "product_id",
         "pterodactyl_id",
+        "user_id",
         "last_billed",
         "canceled"
     ];
@@ -69,6 +70,8 @@ class Server extends Model
      */
     protected $casts = [
         'suspended' => 'datetime',
+        'last_billed' => 'datetime',
+        'canceled' => 'datetime',
         'billing_priority' => BillingPriority::class
     ];
 

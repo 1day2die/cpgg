@@ -382,15 +382,17 @@ class UserController extends Controller
         }
 
 
-
-
-        try {
-            Notification::send($users, new DynamicNotification($data['via'], $database, $mail));
-        } catch (Exception $e) {
-            return redirect()->route('admin.users.notifications.index')->with('error', __('The attempt to send the email failed with the error: ' . $e->getMessage()));
+        $successCount = 0;
+        foreach ($users as $user) {
+            try {
+                $user->notify(new DynamicNotification($data['via'], $database, $mail));
+                $successCount++;
+            } catch (\Throwable $e)
+                Log::error('Mass notification error for user ' . $user->id . ': ' . $e->getMessage());
+            }
         }
 
-        return redirect()->route('admin.users.notifications.index')->with('success', __('Notification sent!'));
+        return redirect()->route('admin.users.notifications.index')->with('success', __('Notification sent to :count users!', ['count' => $successCount]));
     }
 
     /**
@@ -446,12 +448,12 @@ class UserController extends Controller
 
                 return '
                 <a data-content="' . __('Login as User') . '" data-toggle="popover" data-trigger="hover" data-placement="top" href="' . route('admin.users.loginas', $user->id) . '" class="mr-1 btn btn-sm btn-primary"><i class="fas fa-sign-in-alt"></i></a>
-                <a data-content="' . __('Verify') . '" data-toggle="popover" data-trigger="hover" data-placement="top" href="' . route('admin.users.verifyEmail', $user->id) . '" class="mr-1 btn btn-sm btn-secondary"><i class="fas fa-envelope"></i></a>
-                <a data-content="' . __('Show') . '" data-toggle="popover" data-trigger="hover" data-placement="top"  href="' . route('admin.users.show', $user->id) . '" class="mr-1 text-white btn btn-sm btn-warning"><i class="fas fa-eye"></i></a>
+                <a data-content="' . __('Verify') . '" data-toggle="popover" data-trigger="hover" data-placement="top" href="' . route('admin.users.verifyEmail', $user->id) . '" class="mr-1 btn btn-sm btn-info"><i class="fas fa-envelope"></i></a>
+                <a data-content="' . __('Show') . '" data-toggle="popover" data-trigger="hover" data-placement="top"  href="' . route('admin.users.show', $user->id) . '" class="mr-1 text-white btn btn-sm btn-info"><i class="fas fa-eye"></i></a>
                 <a data-content="' . __('Edit') . '" data-toggle="popover" data-trigger="hover" data-placement="top"  href="' . route('admin.users.edit', $user->id) . '" class="mr-1 btn btn-sm btn-info"><i class="fas fa-pen"></i></a>
                 <form class="d-inline" method="post" action="' . route('admin.users.togglesuspend', $user->id) . '">
                              ' . csrf_field() . '
-                            <button data-content="' . $suspendText . '" data-toggle="popover" data-trigger="hover" data-placement="top" class="btn btn-sm ' . $suspendColor . ' text-white mr-1"><i class="far ' . $suspendIcon . '"></i></button>
+                            <button data-content="' . $suspendText . '" data-toggle="popover" data-trigger="hover" data-placement="top" class="btn btn-sm ' . $suspendColor . ' text-white mr-1"><i class="fas ' . $suspendIcon . '"></i></button>
                           </form>
                 <form class="d-inline" onsubmit="return submitResult();" method="post" action="' . route('admin.users.destroy', $user->id) . '">
                              ' . csrf_field() . '

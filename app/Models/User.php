@@ -91,7 +91,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'last_seen' => 'datetime',
-        'server_limit' => 'float',
+        'server_limit' => 'integer',
         'email_verified_reward' => 'boolean'
     ];
 
@@ -144,6 +144,12 @@ class User extends Authenticatable implements MustVerifyEmail
             // We only convert when the user already exists, to avoid 2 conversions.
             set: fn ($value) => $this->exists ? Currency::prepareForDatabase($value) : $value,
         );
+    }
+
+    public function notifications()
+    {
+        return $this->morphMany(Notification::class, 'notifiable')
+            ->orderBy('created_at', 'desc');
     }
 
     /**
