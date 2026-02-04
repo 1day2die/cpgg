@@ -87,16 +87,18 @@ class UserController extends Controller
 
         //QUERY ALL REFERRALS A USER HAS
         //i am not proud of this at all.
-        $allReferals = [];
+        $allReferrals = [];
         $referrals = DB::table('user_referrals')->where('referral_id', '=', $user->id)->get();
+
         foreach ($referrals as $referral) {
-            array_push($allReferals, $allReferals['id'] = User::query()->findOrFail($referral->registered_user_id));
+            array_push($allReferrals, User::query()->findOrFail($referral->registered_user_id));
         }
-        array_pop($allReferals);
+        
+        array_pop($allReferrals);
 
         return view('admin.users.show')->with([
             'user' => $user,
-            'referrals' => $allReferals,
+            'referrals' => $allReferrals,
             'locale_datatables' => $locale_settings->datatables,
             'credits_display_name' => $general_settings->credits_display_name
         ]);

@@ -324,7 +324,7 @@
                                 <div class="row">
 									<div class="col-lg-6">
 										<div class="form-group">
-											<input type="checkbox" value="1" id="oom_killer" name="oom_killer">
+											<input type="checkbox" value="1" id="oom_killer" name="oom_killer" {{ old('oom_killer', $product->oom_killer) ? 'checked' : '' }}>
 											<label for="oom_killer">
                                                 {{ __('OOM Killer') }}
                                                 <i data-toggle="popover"

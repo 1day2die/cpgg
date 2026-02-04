@@ -6,6 +6,7 @@ use App\Classes\PterodactylClient;
 use App\Models\User;
 use App\Settings\GeneralSettings;
 use App\Settings\PterodactylSettings;
+use App\Settings\UserSettings;
 use App\Traits\Referral;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
@@ -47,7 +48,7 @@ class MakeUserCommand extends Command
      *
      * @return int
      */
-    public function handle(PterodactylSettings $ptero_settings, GeneralSettings $general_settings)
+    public function handle(PterodactylSettings $ptero_settings, UserSettings $user_settings)
     {
         $this->pterodactyl = new PterodactylClient($ptero_settings);
         $ptero_id = $this->option('ptero_id') ?? $this->ask('Please specify your Pterodactyl ID.');
@@ -98,8 +99,8 @@ class MakeUserCommand extends Command
             'name' => $response['first_name'],
             'email' => $response['email'],
             'password' => Hash::make($password),
-            'credits' => $general_settings->initial_credits,
-            'server_limit' => $general_settings->initial_server_limit,
+            'credits' => $user_settings->initial_credits,
+            'server_limit' => $user_settings->initial_server_limit,
             'referral_code' => $this->createReferralCode(),
             'pterodactyl_id' => $response['id'],
         ]);

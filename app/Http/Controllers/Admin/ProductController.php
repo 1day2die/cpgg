@@ -80,11 +80,11 @@ class ProductController extends Controller
         $request->validate([
             'name' => 'required|max:30',
             'price' => 'required|numeric|max:1000000|min:0',
-            'memory' => 'required|numeric|max:1000000|min:5',
+            'memory' => 'required|numeric|max:1000000|min:0',
             'cpu' => 'required|numeric|max:1000000|min:0',
             'swap' => 'required|numeric|max:1000000|min:0',
             'description' => 'required|string|max:191',
-            'disk' => 'required|numeric|max:1000000|min:5',
+            'disk' => 'required|numeric|max:1000000|min:0',
             'minimum_credits' => 'nullable|numeric|max:1000000',
             'io' => 'required|numeric|max:1000000|min:0',
             'serverlimit' => 'required|numeric|max:1000000|min:0',

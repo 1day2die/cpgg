@@ -194,7 +194,7 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <span style="max-width: 250px;" class="d-inline-block text-truncate">
-                                        <i class="mr-2 fas fa-coins"></i>{{ $user->CreditUsage() }}
+                                        <i class="mr-2 fas fa-coins"></i>{{ $user->creditUsage() }}
                                     </span>
                                 </div>
                             </div>
@@ -206,7 +206,7 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <span style="max-width: 250px;" class="d-inline-block text-truncate">
-                                        {{ $user->referredBy() != Null ? $user->referredBy()->name : "None" }}
+                                        {{ $user->referredBy() != null ? $user->referredBy()->name : "None" }}
                                     </span>
                                 </div>
                             </div>

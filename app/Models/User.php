@@ -328,7 +328,8 @@ class User extends Authenticatable implements MustVerifyEmail
             $referee = User::where("id", $referee->referral_id)->firstOrFail();
             return $referee;
         }
-        return Null;
+        
+        return null;
     }
 
     public function getActivitylogOptions(): LogOptions
