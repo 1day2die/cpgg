@@ -61,8 +61,6 @@ class ServerController extends Controller
 
     /**
      * Show the specified server.
-     * 
-     * @queryParam include string Comma-separated list of related resources to include. Example: product,user
      *
      * @param  Request  $request
      * @param  string  $serverId
