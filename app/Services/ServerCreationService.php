@@ -126,13 +126,13 @@ class ServerCreationService
         }
 
         // Check if the product is available in the user's location.
-        $findedNode = $this->findAvailableNode($data['location_id'], $product);
+        $availableNode = $this->findAvailableNode($data['location_id'], $product);
 
-        if (!$findedNode) {
+        if (!$availableNode) {
             throw new \Exception('No available nodes for this product in the selected location.');
         }
 
-        $allocationId = $this->pterodactylClient->getFreeAllocationId($findedNode);
+        $allocationId = $this->pterodactylClient->getFreeAllocationId($availableNode);
 
         if (!$allocationId) {
             throw new \Exception('No free allocation available on the selected node.');
@@ -140,7 +140,7 @@ class ServerCreationService
 
         return [
             'allocation_id' => $allocationId,
-            'node_id' => $findedNode->id,
+            'node_id' => $availableNode->id,
         ];
     }
 

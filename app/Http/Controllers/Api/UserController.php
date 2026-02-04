@@ -246,7 +246,23 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
+        DB::beginTransaction();
+
         try {
+            $role_id = $data['role_id'];
+            unset($data['role_id']);
+
+            $user = User::create([
+                ...$data,
+                'credits' => isset($data['credits']) ? $this->currencyHelper->prepareForDatabase($data['credits']) : $userSettings->initial_credits,
+                'server_limit' => $data['server_limit'] ?? $userSettings->initial_server_limit,
+                'referral_code' => $this->createReferralCode(),
+            ]);
+
+            $user->syncRoles([$role_id]);
+
+            $this->incrementReferralUserCredits($user, $data);
+
             $response = $this->pterodactyl->application->post('/application/users', [
                 'external_id' => "0",
                 'username' => $data['name'],
@@ -265,25 +281,18 @@ class UserController extends Controller
                 ]);
             }
 
-            $role_id = $data['role_id'];
-            unset($data['role_id']);
-
-            $user = User::create([
-                ...$data,
-                'credits' => isset($data['credits']) ? $this->currencyHelper->prepareForDatabase($data['credits']) : $userSettings->initial_credits,
-                'server_limit' => $data['server_limit'] ?? $userSettings->initial_server_limit,
-                'referral_code' => $this->createReferralCode(),
+            $user->update([
                 'pterodactyl_id' => $response->json()['attributes']['id'],
             ]);
 
-            $user->syncRoles([$role_id]);
-
-            $this->incrementReferralUserCredits($user, $data);
-
             $user->sendEmailVerificationNotification();
+
+            DB::commit();
 
             return UserResource::make($user);
         } catch (Exception $e) {
+            DB::rollBack();
+
             throw ValidationException::withMessages([
                 'pterodactyl_error_message' => $e->getMessage(),
                 'pterodactyl_error_status' => $e->getCode(),

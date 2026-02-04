@@ -37,7 +37,7 @@ class NotificationService
     /**
      * Send email notification only
      */
-    public function sendEmailNotification($user, string $subject, string $content): void
+    public function sendEmailNotification(User $user, string $subject, string $content): void
     {
         $mail = (new MailMessage)
             ->subject($subject)
