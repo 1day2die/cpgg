@@ -201,6 +201,15 @@ class UserController extends Controller
      */
     public function suspend(Request $request, User $user)
     {
+        $discordUser = DiscordUser::find($id);
+        $user = $discordUser ? $discordUser->user : User::findOrFail($id);
+        
+        $request->validate([
+            'reason' => 'sometimes|string|max:320',
+        ]);
+        
+        $reason = $request->input('reason');
+
         if ($user->isSuspended()) {
             return response()->json([
                 'error' => 'The user is already suspended',

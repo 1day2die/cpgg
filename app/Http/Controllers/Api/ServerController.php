@@ -174,18 +174,25 @@ class ServerController extends Controller
     }
 
     /**
-     * Remove the specified server from the system.
-     *
-     * @param  Request  $request
-     * @param  Server  $server
-     * @return \Illuminate\Http\Response
-     * 
-     * @throws ModelNotFoundException
+     * Remove the specified resource from storage.
      */
     public function destroy(Request $request, Server $server)
     {
-        try {
-            $server->delete();
+        $request->validate([
+            'reason' => 'sometimes|string|max:320',
+        ]);
+
+        $reason = $request->input('reason');
+        
+        $logMessage = "The server with ID: " . $server->id . " was deleted via API";
+        
+        if ($reason) {
+            $logMessage .= ". Reason: " . e($reason);
+        }
+
+        activity()->performedOn($server)->log($logMessage);
+
+        $server->delete();
 
             event(new ServerDeletedEvent($server));
         } catch (Exception $e) {
@@ -206,6 +213,12 @@ class ServerController extends Controller
      */
     public function suspend(Request $request, Server $server)
     {
+        $request->validate([
+            'reason' => 'sometimes|string|max:320',
+        ]);
+
+        $reason = $request->input('reason');
+
         try {
             $server->suspend();
         } catch (Exception $exception) {
@@ -226,12 +239,24 @@ class ServerController extends Controller
      */
     public function unSuspend(Request $request, Server $server)
     {
+        $request->validate([
+            'reason' => 'sometimes|string|max:320',
+        ]);
+
+        $reason = $request->input('reason');
+
         try {
             $server->unSuspend();
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
 
-        return ServerResource::make($server);
+        $logMessage = "The server with ID: " . $server->id . " was unsuspended via API";
+        if ($reason) {
+            $logMessage .= ". Reason: " . e($reason);
+        }
+        activity()->performedOn($server)->log($logMessage);
+
+        return $server->load('product');
     }
 }
