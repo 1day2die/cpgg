@@ -29,7 +29,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request as FacadesRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
-use Illuminate\Support\Facades\Cache;
 
 class ServerController extends Controller
 {

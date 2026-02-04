@@ -89,9 +89,11 @@ class UserController extends Controller
         //i am not proud of this at all.
         $allReferrals = [];
         $referrals = DB::table('user_referrals')->where('referral_id', '=', $user->id)->get();
+
         foreach ($referrals as $referral) {
-            array_push($allReferrals, $allReferrals['id'] = User::query()->findOrFail($referral->registered_user_id));
+            array_push($allReferrals, User::query()->findOrFail($referral->registered_user_id));
         }
+        
         array_pop($allReferrals);
 
         return view('admin.users.show')->with([

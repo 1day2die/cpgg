@@ -62,8 +62,7 @@ class Server extends Model
         "pterodactyl_id",
         "user_id",
         "last_billed",
-        "canceled",
-        "suspension_warning_sent_at"
+        "canceled"
     ];
 
     /**
@@ -148,7 +147,6 @@ class Server extends Model
             $this->update([
                 'suspended' => null,
                 'last_billed' => Carbon::now()->toDateTimeString(),
-                'suspension_warning_sent_at' => null,
             ]);
         }
 

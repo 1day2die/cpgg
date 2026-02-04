@@ -45,7 +45,7 @@
                                         </label>
                                     </div>
                                 </div>
-
+                                
                                 <div class="row">
                                     <div class="col-lg-12">
                                         <div class="form-group">
@@ -72,17 +72,35 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label for="billing_period">{{ __('Billing Period') }} 
-                                                <i data-toggle="popover" data-trigger="hover" data-content="{{ __('Period when the user will be charged for the given price') }}" class="fas fa-info-circle"></i>
-                                            </label>
-                                            <select id="billing_period" style="width:100%" class="custom-select" name="billing_period" required autocomplete="off">
-                                                <option value="hourly" @selected($product->billing_period == 'hourly')>{{ __('Hourly') }}</option>
-                                                <option value="daily" @selected($product->billing_period == 'daily')>{{ __('Daily') }}</option>
-                                                <option value="weekly" @selected($product->billing_period == 'weekly')>{{ __('Weekly') }}</option>
-                                                <option value="monthly" @selected($product->billing_period == 'monthly')>{{ __('Monthly') }}</option>
-                                                <option value="quarterly" @selected($product->billing_period == 'quarterly')>{{ __('Quarterly') }}</option>
-                                                <option value="half-annually" @selected($product->billing_period == 'half-annually')>{{ __('Half Annually') }}</option>
-                                                <option value="annually" @selected($product->billing_period == 'annually')>{{ __('Annually') }}</option>
+                                            <label for="billing_period">{{ __('Billing Period') }} <i
+                                                    data-toggle="popover" data-trigger="hover"
+                                                    data-content="{{ __('Period when the user will be charged for the given price') }}"
+                                                    class="fas fa-info-circle"></i></label>
+    
+                                            <select id="billing_period" style="width:100%" class="custom-select"
+                                                name="billing_period" required autocomplete="off"
+                                                @error('billing_period') is-invalid @enderror>
+                                                <option value="hourly" @selected($product->billing_period == 'hourly')>
+                                                    {{ __('Hourly') }}
+                                                </option>
+                                                <option value="daily" @selected($product->billing_period == 'daily')>
+                                                    {{ __('Daily') }}
+                                                </option>
+                                                <option value="weekly" @selected($product->billing_period == 'weekly')>
+                                                    {{ __('Weekly') }}
+                                                </option>
+                                                <option value="monthly" @selected($product->billing_period == 'monthly')>
+                                                    {{ __('Monthly') }}
+                                                </option>
+                                                <option value="quarterly" @selected($product->billing_period == 'quarterly')>
+                                                    {{ __('Quarterly') }}
+                                                </option>
+                                                <option value="half-annually" @selected($product->billing_period == 'half-annually')>
+                                                    {{ __('Half Annually') }}
+                                                </option>
+                                                <option value="annually" @selected($product->billing_period == 'annually')>
+                                                    {{ __('Annually') }}
+                                                </option>
                                             </select>
                                             @error('billing_period')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -133,7 +151,8 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="cpu">{{ __('Cpu') }}</label>
-                                            <input value="{{ $product->cpu }}" id="cpu" name="cpu" type="number" class="form-control @error('cpu') is-invalid @enderror" required="required">
+                                            <input value="{{ $product->cpu }}" id="cpu" name="cpu" type="number"
+                                                class="form-control @error('cpu') is-invalid @enderror" required="required">
                                             @error('cpu')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -142,7 +161,9 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="disk">{{ __('Disk') }}</label>
-                                            <input value="{{ $product->disk }}" id="disk" name="disk" type="number" class="form-control @error('disk') is-invalid @enderror" required="required">
+                                            <input value="{{ $product->disk }}" id="disk" name="disk"
+                                                type="number" class="form-control @error('disk') is-invalid @enderror"
+                                                required="required">
                                             @error('disk')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -154,7 +175,9 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="memory">{{ __('Memory') }}</label>
-                                            <input value="{{ $product->memory }}" id="memory" name="memory" type="number" class="form-control @error('memory') is-invalid @enderror" required="required">
+                                            <input value="{{ $product->memory }}" id="memory" name="memory"
+                                                type="number" class="form-control @error('memory') is-invalid @enderror"
+                                                required="required">
                                             @error('memory')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -175,7 +198,9 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label for="swap">{{ __('Swap') }}</label>
-                                            <input value="{{ $product->swap }}" id="swap" name="swap" type="number" class="form-control @error('swap') is-invalid @enderror" required="required">
+                                            <input value="{{ $product->swap }}" id="swap" name="swap"
+                                                type="number" class="form-control @error('swap') is-invalid @enderror"
+                                                required="required">
                                             @error('swap')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -224,18 +249,20 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" value="1" id="oom_killer" name="oom_killer" @checked($product->oom_killer)>
-                                                <label class="custom-control-label" for="oom_killer">{{ __('OOM Killer') }}
-                                                    <i data-toggle="popover" data-trigger="hover" data-content="{{ __('Enable or Disable the OOM Killer for this Product.') }}" class="fas fa-info-circle"></i>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
+									<div class="col-lg-6">
+										<div class="form-group">
+											<input type="checkbox" value="1" id="oom_killer" name="oom_killer" {{ old('oom_killer', $product->oom_killer) ? 'checked' : '' }}>
+											<label for="oom_killer">
+                                                {{ __('OOM Killer') }}
+                                                <i data-toggle="popover"
+                                                    data-trigger="hover"
+                                                    data-content="{{ __('Enable or Disable the OOM Killer for this Product.') }}"
+                                                    class="fas fa-info-circle">
+                                                </i>
+                                            </label>
+										</div>
+									</div>
+								</div>
                                 <div class="text-right form-group">
                                     <button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
                                 </div>
