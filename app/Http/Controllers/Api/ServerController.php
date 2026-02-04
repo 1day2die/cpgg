@@ -11,6 +11,9 @@ use App\Models\Server;
 use App\Http\Resources\ServerResource;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Servers\CreateServerRequest;
+use App\Http\Requests\Api\Servers\DeleteServerRequest;
+use App\Http\Requests\Api\Servers\SuspendServerRequest;
+use App\Http\Requests\Api\Servers\UnsuspendServerRequest;
 use App\Http\Requests\Api\Servers\UpdateServerBuildRequest;
 use App\Http\Requests\Api\Servers\UpdateServerRequest;
 use App\Services\ServerCreationService;
@@ -174,27 +177,30 @@ class ServerController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified server from the system.
+     *
+     * @param  DeleteServerRequest  $request
+     * @param  Server  $server
+     * @return \Illuminate\Http\Response
+     * 
+     * @throws ModelNotFoundException
      */
-    public function destroy(Request $request, Server $server)
+    public function destroy(DeleteServerRequest $request, Server $server)
     {
-        $request->validate([
-            'reason' => 'sometimes|string|max:320',
-        ]);
+        $data = $request->validated();
 
-        $reason = $request->input('reason');
-        
-        $logMessage = "The server with ID: " . $server->id . " was deleted via API";
-        
-        if ($reason) {
-            $logMessage .= ". Reason: " . e($reason);
-        }
+        try {
+            $logMessage = sprintf("The server with ID: %d was deleted via API", $server->id);
 
-        activity()->performedOn($server)->log($logMessage);
+            if (!empty($data['reason'])) {
+                $logMessage .= " | Reason: " . e($data['reason']);
+            }
 
-        $server->delete();
+            activity()->performedOn($server)->log($logMessage);
 
             event(new ServerDeletedEvent($server));
+
+            $server->delete();
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -205,21 +211,25 @@ class ServerController extends Controller
     /**
      * Suspend server.
      *
-     * @param  Request  $request
+     * @param  SuspendServerRequest  $request
      * @param  Server  $server
      * @return ServerResource|JsonResponse
      * 
      * @throws ModelNotFoundException
      */
-    public function suspend(Request $request, Server $server)
+    public function suspend(SuspendServerRequest $request, Server $server)
     {
-        $request->validate([
-            'reason' => 'sometimes|string|max:320',
-        ]);
-
-        $reason = $request->input('reason');
+        $data = $request->validated();
 
         try {
+            $logMessage = sprintf("The server with ID: %d was suspended via API", $server->id);
+
+            if (!empty($data['reason'])) {
+                $logMessage .= " | Reason: " . e($data['reason']);
+            }
+
+            activity()->performedOn($server)->log($logMessage);
+
             $server->suspend();
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
@@ -231,32 +241,30 @@ class ServerController extends Controller
     /**
      * Unsuspend server.
      *
-     * @param  Request  $request
+     * @param  UnsuspendServerRequest  $request
      * @param  Server  $server
      * @return ServerResource|JsonResponse
      * 
      * @throws ModelNotFoundException
      */
-    public function unSuspend(Request $request, Server $server)
+    public function unSuspend(UnsuspendServerRequest $request, Server $server)
     {
-        $request->validate([
-            'reason' => 'sometimes|string|max:320',
-        ]);
-
-        $reason = $request->input('reason');
+        $data = $request->validated();
 
         try {
+            $logMessage = sprintf("The server with ID: %d was unsuspended via API", $server->id);
+
+            if (!empty($data['reason'])) {
+                $logMessage .= " | Reason: " . e($data['reason']);
+            }
+
+            activity()->performedOn($server)->log($logMessage);
+
             $server->unSuspend();
         } catch (Exception $exception) {
             return response()->json(['message' => $exception->getMessage()], 500);
         }
 
-        $logMessage = "The server with ID: " . $server->id . " was unsuspended via API";
-        if ($reason) {
-            $logMessage .= ". Reason: " . e($reason);
-        }
-        activity()->performedOn($server)->log($logMessage);
-
-        return $server->load('product');
+        return ServerResource::make($server);
     }
 }

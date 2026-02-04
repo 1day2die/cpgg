@@ -14,7 +14,10 @@ use App\Settings\UserSettings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Users\CreateUserRequest;
 use App\Http\Requests\Api\Users\DecrementRequest;
+use App\Http\Requests\Api\Users\DeleteUserRequest;
 use App\Http\Requests\Api\Users\IncrementRequest;
+use App\Http\Requests\Api\Users\SuspendUserRequest;
+use App\Http\Requests\Api\Users\UnsuspendUserRequest;
 use App\Http\Requests\Api\Users\UpdateUserRequest;
 use App\Traits\Referral;
 use Carbon\Carbon;
@@ -199,22 +202,23 @@ class UserController extends Controller
      * 
      * @throws ModelNotFoundException
      */
-    public function suspend(Request $request, User $user)
+    public function suspend(SuspendUserRequest $request, User $user)
     {
-        $discordUser = DiscordUser::find($id);
-        $user = $discordUser ? $discordUser->user : User::findOrFail($id);
-        
-        $request->validate([
-            'reason' => 'sometimes|string|max:320',
-        ]);
-        
-        $reason = $request->input('reason');
+        $data = $request->validated();
 
         if ($user->isSuspended()) {
             return response()->json([
                 'error' => 'The user is already suspended',
             ], 400);
         }
+
+        $logMessage = sprintf("The user %s (ID: %d) was suspended via API", $user->name, $user->id);
+
+        if (!empty($data['reason'])) {
+            $logMessage .= " | Reason: " . $data['reason'];
+        }
+
+        activity()->performedOn($user)->log($logMessage);
         
         $user->suspend();
 
@@ -230,13 +234,23 @@ class UserController extends Controller
      * 
      * @throws ModelNotFoundException
      */
-    public function unsuspend(Request $request, User $user)
+    public function unsuspend(UnsuspendUserRequest $request, User $user)
     {
+        $data = $request->validated();
+
         if (!$user->isSuspended()) {
             return response()->json([
                 'error' => 'The user is not suspended',
             ], 400);
         }
+
+        $logMessage = sprintf("The user %s (ID: %d) was unsuspended via API", $user->name, $user->id);
+
+        if (!empty($data['reason'])) {
+            $logMessage .= " | Reason: " . $data['reason'];
+        }
+
+        activity()->performedOn($user)->log($logMessage);
 
         $user->unSuspend();
 
@@ -318,8 +332,18 @@ class UserController extends Controller
      * 
      * @throws ModelNotFoundException
      */
-    public function destroy(Request $request, User $user)
+    public function destroy(DeleteUserRequest $request, User $user)
     {
+        $data = $request->validated();
+
+        $logMessage = sprintf("The user %s (ID: %d) was deleted via API", $user->name, $user->id);
+
+        if (!empty($data['reason'])) {
+            $logMessage .= " | Reason: " . $data['reason'];
+        }
+
+        activity()->performedOn($user)->log($logMessage);
+
         $user->delete();
 
         return response()->noContent();
