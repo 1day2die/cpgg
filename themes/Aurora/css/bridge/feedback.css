@@ -1,0 +1,191 @@
+/* Status and feedback: alerts, badges, progress, loading and empty states */
+
+:root {
+    /* Alerts: soft tint with a colored edge */
+    & .alert {
+        --aurora-alert-tone: var(--aurora-text-muted);
+        --aurora-alert-line: var(--aurora-border);
+        --aurora-alert-bg: var(--aurora-surface-muted);
+        color: var(--aurora-text);
+        background-color: var(--aurora-alert-bg);
+        border: 1px solid var(--aurora-alert-line);
+        border-radius: var(--aurora-radius-field);
+        box-shadow: inset 3px 0 0 var(--aurora-alert-tone);
+        padding: 0.875rem 1.125rem;
+    }
+
+    & .alert-primary {
+        --aurora-alert-tone: var(--color-primary);
+        --aurora-alert-line: color-mix(in oklab, var(--color-primary) 30%, transparent);
+        --aurora-alert-bg: var(--aurora-primary-soft);
+        --aurora-alert-fg: var(--aurora-primary-fg);
+    }
+
+    & .alert-info {
+        --aurora-alert-tone: var(--color-info);
+        --aurora-alert-line: color-mix(in oklab, var(--color-info) 30%, transparent);
+        --aurora-alert-bg: var(--aurora-info-soft);
+        --aurora-alert-fg: var(--aurora-info-fg);
+    }
+
+    & .alert-success {
+        --aurora-alert-tone: var(--color-success);
+        --aurora-alert-line: color-mix(in oklab, var(--color-success) 30%, transparent);
+        --aurora-alert-bg: var(--aurora-success-soft);
+        --aurora-alert-fg: var(--aurora-success-fg);
+    }
+
+    & .alert-warning {
+        --aurora-alert-tone: var(--color-warning);
+        --aurora-alert-line: color-mix(in oklab, var(--color-warning) 40%, transparent);
+        --aurora-alert-bg: var(--aurora-warning-soft);
+        --aurora-alert-fg: var(--aurora-warning-fg);
+    }
+
+    & .alert-danger {
+        --aurora-alert-tone: var(--color-error);
+        --aurora-alert-line: color-mix(in oklab, var(--color-error) 30%, transparent);
+        --aurora-alert-bg: var(--aurora-error-soft);
+        --aurora-alert-fg: var(--aurora-error-fg);
+    }
+
+    & :is(.alert-secondary, .alert-dark, .alert-light) {
+        --aurora-alert-tone: var(--aurora-field-border);
+        --aurora-alert-line: var(--aurora-border);
+        --aurora-alert-bg: var(--aurora-surface-muted);
+        --aurora-alert-fg: var(--aurora-text);
+    }
+
+    & .alert :is(h1, h2, h3, h4, h5, h6, .alert-heading, b:first-child) {
+        color: var(--aurora-alert-fg, var(--aurora-text));
+    }
+
+    & .alert :is(.icon, .fas, .far, .fa):first-child {
+        color: var(--aurora-alert-fg, var(--aurora-text-muted));
+    }
+
+    & .alert :is(a, .alert-link) {
+        color: var(--aurora-alert-fg, var(--aurora-link));
+        font-weight: 600;
+        text-decoration: underline;
+        text-decoration-thickness: from-font;
+    }
+
+    & .alert .alert-link.text-decoration-none {
+        text-decoration: none !important;
+    }
+
+    & .alert-dismissible .close {
+        color: var(--aurora-text-muted);
+        opacity: 1;
+        padding: 0.875rem 1rem;
+    }
+
+    & .alert-dismissible .close:hover {
+        color: var(--aurora-text);
+    }
+
+    /* Align page-level notices with the content grid */
+    & .content-wrapper > :is(.alert, .callout) {
+        margin-left: calc(0.5rem + 7.5px);
+        margin-right: calc(0.5rem + 7.5px);
+    }
+
+    & .content-header > .alert {
+        margin: 0.5rem 7.5px 0;
+    }
+
+    /* Badges: soft pills */
+    & .badge {
+        color: var(--aurora-text);
+        background-color: var(--aurora-neutral-soft);
+        border-radius: var(--aurora-radius-pill);
+        font-weight: 600;
+        letter-spacing: 0.01em;
+        padding: 0.3em 0.65em;
+    }
+
+    & .badge[style*="background"] {
+        color: oklch(100% 0 0);
+        text-shadow: 0 1px 1px oklch(0% 0 0 / 0.35);
+    }
+
+    /* Set by aurora.js for light custom colors */
+    & .badge[style*="background"].aurora-badge-on-light {
+        color: oklch(20% 0.02 264);
+        text-shadow: none;
+    }
+
+    & .badge-primary {
+        color: var(--aurora-primary-fg);
+        background-color: var(--aurora-primary-soft);
+    }
+
+    & .badge-secondary {
+        color: var(--aurora-secondary-fg);
+        background-color: var(--aurora-secondary-soft);
+    }
+
+    & .badge-info {
+        color: var(--aurora-info-fg);
+        background-color: var(--aurora-info-soft);
+    }
+
+    & .badge-success {
+        color: var(--aurora-success-fg);
+        background-color: var(--aurora-success-soft);
+    }
+
+    & .badge-warning {
+        color: var(--aurora-warning-fg);
+        background-color: var(--aurora-warning-soft);
+    }
+
+    & .badge-danger {
+        color: var(--aurora-error-fg);
+        background-color: var(--aurora-error-soft);
+    }
+
+    & :is(.badge-dark, .badge-light) {
+        color: var(--aurora-text);
+        background-color: var(--aurora-neutral-soft);
+    }
+
+    & a.badge:is(:hover, :focus) {
+        filter: brightness(1.08);
+        text-decoration: none;
+    }
+
+    /* Solid badges where they must stand out on any surface */
+    & .badge.navbar-badge.badge-warning {
+        color: var(--color-warning-content);
+        background-color: var(--color-warning);
+    }
+
+    & .badge.navbar-badge.badge-danger {
+        color: var(--color-error-content);
+        background-color: var(--color-error);
+    }
+
+    /* Progress */
+    & .progress {
+        background-color: var(--aurora-neutral-soft);
+        border-radius: var(--aurora-radius-pill);
+        box-shadow: none;
+    }
+
+    & .progress-bar {
+        background-color: var(--color-primary);
+    }
+
+    /* Loading */
+    & :is(.spinner-border, .spinner-grow) {
+        color: var(--color-primary);
+    }
+
+    & .overlay-wrapper > .overlay,
+    & .card > .overlay {
+        background-color: color-mix(in oklab, var(--aurora-surface) 70%, transparent);
+        border-radius: inherit;
+    }
+}

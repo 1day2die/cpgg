@@ -4,7 +4,9 @@
         "development": "vite",
         "production": "vite build",
         "dev:default": "vite --config themes/default/vite.config.js",
-        "build:default": "vite build --config themes/default/vite.config.js"
+        "build:default": "vite build --config themes/default/vite.config.js",
+        "dev:aurora": "npm --prefix themes/Aurora run dev",
+        "build:aurora": "npm --prefix themes/Aurora ci && npm --prefix themes/Aurora run build"
     },
     "devDependencies": {
         "axios": "^0.25",

@@ -1,0 +1,152 @@
+/* Page-specific refinements that build on the shared components */
+
+:root {
+    /* Authentication */
+    & :is(.login-page, .register-page) {
+        /* AdminLTE's JS sets an inline min-height (box height); height keeps it centered */
+        height: 100vh;
+        height: 100dvh;
+        padding: 1rem;
+        background-color: var(--aurora-canvas);
+        background-image:
+            radial-gradient(60rem 30rem at 50% -10%, color-mix(in oklab, var(--color-primary) 14%, transparent), transparent 70%),
+            radial-gradient(40rem 24rem at 100% 100%, color-mix(in oklab, var(--color-accent) 8%, transparent), transparent 70%);
+    }
+
+    & :is(.login-box, .register-box) {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    & :is(.login-box, .register-box) .card {
+        box-shadow: var(--aurora-shadow-lg);
+    }
+
+    & :is(.login-box, .register-box) .card-header {
+        border-bottom: 0;
+        padding: 1.75rem 1.75rem 0.5rem;
+    }
+
+    & :is(.login-box, .register-box) .card-header .h1 {
+        color: var(--aurora-text);
+        font-size: var(--aurora-text-2xl);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        text-decoration: none;
+    }
+
+    & :is(.login-box, .register-box) .card-header .h1 b {
+        font-weight: 700;
+    }
+
+    & :is(.login-box, .register-box) .card-body {
+        padding: 0.75rem 1.75rem 1.75rem;
+    }
+
+    & [class*="icheck-"] > input:first-child {
+        margin-right: 0.5rem;
+        vertical-align: -0.125em;
+    }
+
+    & :is(.login-box-msg, .register-box-msg) {
+        color: var(--aurora-text-muted);
+        padding: 0 0 1.25rem;
+    }
+
+    & .login-page > .fixed-bottom,
+    & .register-page > .fixed-bottom {
+        padding: 0.75rem 1rem;
+        font-size: var(--aurora-text-sm);
+    }
+
+    & :is(.login-page, .register-page) .fixed-bottom a {
+        color: var(--aurora-text-muted);
+    }
+
+    & :is(.login-page, .register-page) .fixed-bottom a:hover {
+        color: var(--aurora-text);
+    }
+
+    @media (max-width: 575.98px) {
+        & :is(.login-box, .register-box) {
+            margin-top: 0;
+        }
+
+        & :is(.login-box, .register-box) :is(.card-header, .card-body) {
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+    }
+
+    /* Legal pages */
+    & .privacy-card {
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
+
+    & .privacy-card .card-header {
+        font-size: var(--aurora-text-lg);
+        font-weight: 600;
+    }
+
+    /* Servers */
+    & .word-break {
+        overflow-wrap: anywhere;
+    }
+
+    & .content .row > .card.col-xl-3 .card-footer {
+        background-color: transparent;
+    }
+
+    & .content .row > .card.col-xl-3 .card-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+    }
+
+    /* Store checkout (mirrors the parent theme's app.scss) */
+    & .checkout-gateways {
+        cursor: pointer;
+    }
+
+    & .checkout-gateways:not(:last-child) {
+        margin-bottom: 1rem;
+    }
+
+    & .checkout-gateway-label {
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    /* Tickets */
+    & .user-image {
+        width: 1.5625rem;
+        height: 1.5625rem;
+        margin-right: 0.375rem;
+        border-radius: 50%;
+        vertical-align: -0.375rem;
+        object-fit: cover;
+    }
+
+    & .img-bordered-xs {
+        border: 1px solid var(--aurora-border);
+    }
+
+    & .comment-form {
+        margin-top: 1rem;
+    }
+
+    /* Rich text output (MOTD, notifications, legal texts) */
+    & .card-body :is(ul, ol):last-child,
+    & .card-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    & .card-body img {
+        max-width: 100%;
+        height: auto;
+    }
+}

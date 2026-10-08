@@ -1,0 +1,150 @@
+/*
+ * Aurora theme for CtrlPanel.
+ *
+ * Cascade layers (lowest to highest):
+ *   legacy     Vendor CSS of the parent theme (Bootstrap 4 / AdminLTE 3 / plugins)
+ *              followed by the Aurora bridge, which restyles that markup through tokens.
+ *              Bridge and vendor share one layer so the usual specificity rules apply.
+ *   theme      Tailwind theme variables (prefixed with "tw").
+ *   base       daisyUI themes and Aurora tokens.
+ *   utilities  Tailwind utilities and daisyUI components, used as `tw:*` in Aurora views.
+ * Unlayered   Overrides for CSS injected at runtime (SweetAlert2) or loaded via <link> (Summernote).
+ */
+
+@layer legacy, theme, base, components, utilities;
+
+@import "../../../public/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css" layer(legacy);
+@import "../../../public/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css" layer(legacy);
+@import "../../../public/plugins/select2/css/select2.min.css" layer(legacy);
+@import "../../default/css/stylesheet.css" layer(legacy);
+@import "../../default/css/adminlte.min.css" layer(legacy);
+@import "../../default/css/slim.min.css" layer(legacy);
+
+@import "tailwindcss/theme.css" layer(theme) prefix(tw);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@source "../views";
+
+@plugin "daisyui" {
+    themes: false;
+    exclude: rootscrollgutter, rootscrolllock, rootcolor, scrollbar;
+    logs: false;
+}
+
+@plugin "daisyui/theme" {
+    name: "aurora-dark";
+    default: true;
+    color-scheme: dark;
+    --color-base-100: oklch(22% 0.014 264);
+    --color-base-200: oklch(18% 0.012 264);
+    --color-base-300: oklch(29% 0.016 264);
+    --color-base-content: oklch(93% 0.008 264);
+    --color-primary: oklch(56% 0.2 262);
+    --color-primary-content: oklch(100% 0 0);
+    --color-secondary: oklch(45% 0.03 264);
+    --color-secondary-content: oklch(100% 0 0);
+    --color-accent: oklch(56% 0.21 290);
+    --color-accent-content: oklch(100% 0 0);
+    --color-neutral: oklch(32% 0.018 264);
+    --color-neutral-content: oklch(93% 0.008 264);
+    --color-info: oklch(53% 0.11 225);
+    --color-info-content: oklch(100% 0 0);
+    --color-success: oklch(53% 0.14 152);
+    --color-success-content: oklch(100% 0 0);
+    --color-warning: oklch(81% 0.16 78);
+    --color-warning-content: oklch(30% 0.08 55);
+    --color-error: oklch(56% 0.21 25);
+    --color-error-content: oklch(100% 0 0);
+    --radius-selector: 0.5rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.75rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+    name: "aurora-light";
+    color-scheme: light;
+    --color-base-100: oklch(100% 0 0);
+    --color-base-200: oklch(97.6% 0.004 264);
+    --color-base-300: oklch(92.5% 0.008 264);
+    --color-base-content: oklch(25% 0.02 264);
+    --color-primary: oklch(53% 0.2 262);
+    --color-primary-content: oklch(100% 0 0);
+    --color-secondary: oklch(52% 0.03 264);
+    --color-secondary-content: oklch(100% 0 0);
+    --color-accent: oklch(53% 0.22 290);
+    --color-accent-content: oklch(100% 0 0);
+    --color-neutral: oklch(28% 0.02 264);
+    --color-neutral-content: oklch(97% 0.005 264);
+    --color-info: oklch(53% 0.11 225);
+    --color-info-content: oklch(100% 0 0);
+    --color-success: oklch(53% 0.14 152);
+    --color-success-content: oklch(100% 0 0);
+    --color-warning: oklch(81% 0.16 78);
+    --color-warning-content: oklch(30% 0.08 55);
+    --color-error: oklch(56% 0.21 25);
+    --color-error-content: oklch(100% 0 0);
+    --radius-selector: 0.5rem;
+    --radius-field: 0.5rem;
+    --radius-box: 0.75rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
+}
+
+@import "./tokens.css" layer(base);
+
+/* Inter (OFL), self-hosted. Paths are relative to public/themes/Aurora/app.css */
+@font-face {
+    font-family: "Inter Variable";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url("fonts/inter-cyrillic-ext-wght-normal.woff2") format("woff2-variations");
+    unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+
+@font-face {
+    font-family: "Inter Variable";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url("fonts/inter-cyrillic-wght-normal.woff2") format("woff2-variations");
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+    font-family: "Inter Variable";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url("fonts/inter-latin-ext-wght-normal.woff2") format("woff2-variations");
+    unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+    font-family: "Inter Variable";
+    font-style: normal;
+    font-display: swap;
+    font-weight: 100 900;
+    src: url("fonts/inter-latin-wght-normal.woff2") format("woff2-variations");
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@import "./bridge/base.css" layer(legacy);
+@import "./bridge/layout.css" layer(legacy);
+@import "./bridge/navigation.css" layer(legacy);
+@import "./bridge/buttons.css" layer(legacy);
+@import "./bridge/cards.css" layer(legacy);
+@import "./bridge/forms.css" layer(legacy);
+@import "./bridge/tables.css" layer(legacy);
+@import "./bridge/feedback.css" layer(legacy);
+@import "./bridge/overlays.css" layer(legacy);
+@import "./bridge/plugins.css" layer(legacy);
+@import "./bridge/pages.css" layer(legacy);
+@import "./bridge/runtime.css";

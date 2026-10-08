@@ -1,0 +1,230 @@
+/* Bundled jQuery plugins: Select2, Tempus Dominus date picker */
+
+:root {
+    /* Select2: selection */
+    & .select2-container--default :is(.select2-selection--single, .select2-selection--multiple) {
+        color: var(--aurora-text);
+        background-color: var(--aurora-field-bg);
+        border: 1px solid var(--aurora-field-border);
+        border-radius: var(--aurora-radius-field);
+        box-shadow: var(--aurora-shadow-xs);
+        transition: var(--aurora-transition);
+    }
+
+    & .select2-container--default:not(.select2-container--disabled) :is(.select2-selection--single, .select2-selection--multiple):hover {
+        border-color: var(--aurora-field-border-hover);
+    }
+
+    & .select2-container--default:is(.select2-container--focus, .select2-container--open) :is(.select2-selection--single, .select2-selection--multiple) {
+        border-color: var(--color-primary);
+        box-shadow: var(--aurora-ring);
+    }
+
+    & .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: var(--aurora-text);
+    }
+
+    & .select2-container--default .select2-selection__placeholder {
+        color: var(--aurora-text-subtle);
+    }
+
+    & .select2-container--default .select2-selection--single .select2-selection__arrow {
+        top: 50%;
+        right: 0.5rem;
+        height: 1.25rem;
+        transform: translateY(-50%);
+        background: var(--aurora-select-arrow) no-repeat center / 14px 10px;
+    }
+
+    & .select2-container--default .select2-selection--single .select2-selection__arrow b {
+        display: none;
+    }
+
+    & .select2-container--default .select2-selection__clear {
+        color: var(--aurora-text-subtle);
+    }
+
+    & .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        color: var(--aurora-primary-fg);
+        background-color: var(--aurora-primary-soft);
+        border: 0;
+        border-radius: var(--aurora-radius-sm);
+        font-size: var(--aurora-text-md);
+        font-weight: 500;
+        padding: 0.0625rem 0.5rem;
+    }
+
+    & .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: inherit;
+        opacity: 0.7;
+    }
+
+    & .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+        color: inherit;
+        opacity: 1;
+    }
+
+    & .select2-container--default .select2-search--inline .select2-search__field {
+        color: var(--aurora-text);
+        background-color: transparent;
+    }
+
+    & .select2-container--default.select2-container--disabled :is(.select2-selection--single, .select2-selection--multiple) {
+        background-color: var(--aurora-field-disabled-bg);
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+
+    /* Select2: dropdown */
+    & .select2-container--default .select2-dropdown {
+        color: var(--aurora-text);
+        background-color: var(--aurora-overlay-surface);
+        border: 1px solid var(--aurora-border);
+        border-radius: var(--aurora-radius-field);
+        box-shadow: var(--aurora-shadow-lg);
+        overflow: hidden;
+    }
+
+    & .select2-container--default .select2-dropdown.select2-dropdown--below {
+        border-top: 1px solid var(--aurora-border);
+        margin-top: 4px;
+    }
+
+    & .select2-container--default .select2-dropdown.select2-dropdown--above {
+        border-bottom: 1px solid var(--aurora-border);
+        margin-top: -4px;
+    }
+
+    & .select2-container--default .select2-search--dropdown {
+        padding: 0.5rem 0.5rem 0.25rem;
+    }
+
+    & .select2-container--default .select2-dropdown .select2-search__field {
+        color: var(--aurora-text);
+        background-color: var(--aurora-field-bg);
+        border: 1px solid var(--aurora-field-border);
+        border-radius: var(--aurora-radius-sm);
+        padding: 0.375rem 0.625rem;
+    }
+
+    & .select2-container--default .select2-dropdown .select2-search__field:focus {
+        border-color: var(--color-primary);
+        box-shadow: var(--aurora-ring);
+    }
+
+    & .select2-container--default .select2-results > .select2-results__options {
+        padding: 0.25rem;
+    }
+
+    & .select2-container--default .select2-results__option {
+        border-radius: var(--aurora-radius-sm);
+        font-size: var(--aurora-text-md);
+        padding: 0.4375rem 0.625rem;
+    }
+
+    & .select2-container--default .select2-results__option[aria-selected="true"],
+    & .select2-container--default .select2-results__option[aria-selected="true"]:hover {
+        color: var(--aurora-text);
+        background-color: var(--aurora-neutral-soft);
+        font-weight: 600;
+    }
+
+    & .select2-container--default .select2-results__option--highlighted,
+    & .select2-container--default .select2-results__option--highlighted[aria-selected],
+    & .select2-container--default .select2-results__option--highlighted[aria-selected]:hover {
+        color: var(--aurora-primary-fg);
+        background-color: var(--aurora-primary-soft);
+    }
+
+    & .select2-container--default .select2-results__option[aria-disabled="true"] {
+        color: var(--aurora-text-subtle);
+    }
+
+    & .select2-container--default .select2-results__group {
+        color: var(--aurora-text-subtle);
+        font-size: var(--aurora-text-2xs);
+        font-weight: 600;
+        letter-spacing: var(--aurora-tracking-caps);
+        text-transform: uppercase;
+        padding: 0.5rem 0.625rem 0.25rem;
+    }
+
+    & .select2-container--default .select2-results__message {
+        color: var(--aurora-text-muted);
+    }
+
+    /* Tempus Dominus date/time picker (keeps the plugin's fixed width and padding) */
+    & .bootstrap-datetimepicker-widget.dropdown-menu {
+        padding: 4px;
+    }
+
+    & .bootstrap-datetimepicker-widget.dropdown-menu.bottom::before {
+        border-bottom-color: var(--aurora-border);
+    }
+
+    & .bootstrap-datetimepicker-widget.dropdown-menu.bottom::after {
+        border-bottom-color: var(--aurora-overlay-surface);
+    }
+
+    & .bootstrap-datetimepicker-widget.dropdown-menu.top::before {
+        border-top-color: var(--aurora-border);
+    }
+
+    & .bootstrap-datetimepicker-widget.dropdown-menu.top::after {
+        border-top-color: var(--aurora-overlay-surface);
+    }
+
+    & .bootstrap-datetimepicker-widget table :is(td, th) {
+        border-radius: var(--aurora-radius-sm);
+    }
+
+    & .bootstrap-datetimepicker-widget table th {
+        color: var(--aurora-text-muted);
+        font-weight: 600;
+    }
+
+    & .bootstrap-datetimepicker-widget table thead tr:first-child th:hover,
+    & .bootstrap-datetimepicker-widget table td:is(.day, .hour, .minute, .second):hover,
+    & .bootstrap-datetimepicker-widget table td span:hover {
+        color: var(--aurora-text);
+        background: var(--aurora-hover);
+    }
+
+    & .bootstrap-datetimepicker-widget table td:is(.old, .new),
+    & .bootstrap-datetimepicker-widget table td span.old,
+    & .bootstrap-datetimepicker-widget table td.cw {
+        color: var(--aurora-text-subtle);
+    }
+
+    & .bootstrap-datetimepicker-widget table td.today::before {
+        border-bottom-color: var(--color-primary);
+    }
+
+    & .bootstrap-datetimepicker-widget table td.active,
+    & .bootstrap-datetimepicker-widget table td.active:hover,
+    & .bootstrap-datetimepicker-widget table td span.active {
+        color: var(--color-primary-content);
+        background-color: var(--color-primary);
+        text-shadow: none;
+    }
+
+    & .bootstrap-datetimepicker-widget table :is(td, th).disabled,
+    & .bootstrap-datetimepicker-widget table td span.disabled {
+        color: var(--aurora-text-subtle);
+        opacity: 0.5;
+    }
+
+    & .bootstrap-datetimepicker-widget .timepicker .timepicker-picker a.btn,
+    & .bootstrap-datetimepicker-widget .btn {
+        color: var(--aurora-primary-fg);
+        box-shadow: none;
+    }
+
+    & .bootstrap-datetimepicker-widget .btn:hover {
+        background-color: var(--aurora-hover);
+    }
+
+    & .bootstrap-datetimepicker-widget .picker-switch td span:hover {
+        background: var(--aurora-hover);
+    }
+}

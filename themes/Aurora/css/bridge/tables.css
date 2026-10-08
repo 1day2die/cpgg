@@ -1,0 +1,178 @@
+/* Tables and DataTables controls, tuned for dense admin views */
+
+:root {
+    & .table {
+        color: var(--aurora-text);
+        font-size: var(--aurora-text-md);
+        font-variant-numeric: tabular-nums;
+    }
+
+    & .table :is(td, th) {
+        border-top: 1px solid var(--aurora-border);
+        padding: var(--aurora-table-cell-y) var(--aurora-table-cell-x);
+        vertical-align: middle;
+    }
+
+    & .table thead th {
+        color: var(--aurora-text-muted);
+        background-color: var(--aurora-table-head-bg);
+        border-top: 0;
+        border-bottom: 1px solid var(--aurora-border);
+        font-size: var(--aurora-text-sm);
+        font-weight: 600;
+    }
+
+    & .table-sm :is(td, th) {
+        padding: 0.375rem 0.625rem;
+    }
+
+    & .table-striped tbody tr:nth-of-type(odd) {
+        background-color: var(--aurora-table-stripe);
+    }
+
+    & .table tbody tr {
+        transition: background-color var(--aurora-duration) var(--aurora-ease);
+    }
+
+    & .table tbody tr:hover {
+        color: var(--aurora-text);
+        background-color: var(--aurora-table-hover);
+    }
+
+    & .table-bordered,
+    & .table-bordered :is(td, th) {
+        border-color: var(--aurora-border);
+    }
+
+    & .table .badge {
+        vertical-align: middle;
+    }
+
+    /* Keep row actions on one line; wide tables scroll inside .table-responsive */
+    & .table td:has(.btn-sm) {
+        white-space: nowrap;
+    }
+
+    & .table img.rounded-circle,
+    & .table img.img-circle {
+        object-fit: cover;
+    }
+
+    & .card-body.table-responsive,
+    & .card-body > .table-responsive {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    & .card-body > .table:last-child,
+    & .card-body > .table-responsive:last-child > .table {
+        margin-bottom: 0;
+    }
+
+    /* DataTables */
+    & div.dataTables_wrapper {
+        color: var(--aurora-text);
+    }
+
+    & div.dataTables_wrapper .row:first-child {
+        margin-bottom: 0.25rem;
+    }
+
+    & div.dataTables_wrapper :is(div.dataTables_length, div.dataTables_filter) label {
+        color: var(--aurora-text-muted);
+        font-size: var(--aurora-text-md);
+        font-weight: 500;
+    }
+
+    & div.dataTables_wrapper div.dataTables_filter input {
+        min-width: 14rem;
+        padding-left: 2rem;
+        background-image: var(--aurora-search-icon);
+        background-position: left 0.625rem center;
+        background-repeat: no-repeat;
+        background-size: 14px 14px;
+    }
+
+    & div.dataTables_wrapper div.dataTables_length select {
+        min-width: 4.5rem;
+    }
+
+    & div.dataTables_wrapper div.dataTables_info {
+        color: var(--aurora-text-muted);
+        font-size: var(--aurora-text-sm);
+        padding-top: 0.75rem;
+    }
+
+    & div.dataTables_wrapper div.dataTables_paginate {
+        padding-top: 0.5rem;
+    }
+
+    & div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+        flex-wrap: wrap;
+    }
+
+    & div.dataTables_wrapper div.dataTables_processing {
+        z-index: 5;
+        color: var(--aurora-text);
+        background-color: var(--aurora-overlay-surface);
+        border: 1px solid var(--aurora-border);
+        border-radius: var(--aurora-radius-field);
+        box-shadow: var(--aurora-shadow-md);
+        font-size: var(--aurora-text-md);
+        font-weight: 500;
+    }
+
+    & table.dataTable {
+        margin-top: 0.5rem !important;
+    }
+
+    & table.dataTable > thead :is(.sorting, .sorting_asc, .sorting_desc) {
+        transition: color var(--aurora-duration) var(--aurora-ease);
+    }
+
+    & table.dataTable > thead :is(.sorting, .sorting_asc, .sorting_desc):hover {
+        color: var(--aurora-text);
+    }
+
+    & table.dataTable > thead :is(.sorting_asc, .sorting_desc) {
+        color: var(--aurora-text);
+    }
+
+    & table.dataTable > thead :is(.sorting, .sorting_asc, .sorting_desc)::before,
+    & table.dataTable > thead :is(.sorting, .sorting_asc, .sorting_desc)::after {
+        bottom: 50%;
+        transform: translateY(50%);
+        font-size: 0.8125rem;
+    }
+
+    & table.dataTable > thead .sorting_asc::before,
+    & table.dataTable > thead .sorting_desc::after {
+        color: var(--aurora-primary-fg);
+    }
+
+    & table.dataTable td.dataTables_empty {
+        color: var(--aurora-text-muted);
+        padding: 2.5rem 1rem;
+    }
+
+    & table.dataTable td.dataTables_empty::before {
+        content: "\f01c";
+        display: block;
+        margin-bottom: 0.5rem;
+        color: var(--aurora-text-subtle);
+        font: 900 1.5rem/1 "Font Awesome 5 Free";
+    }
+
+    @media (max-width: 767.98px) {
+        & div.dataTables_wrapper div.dataTables_filter input {
+            min-width: 0;
+            width: 100%;
+            margin-left: 0;
+            margin-top: 0.25rem;
+        }
+
+        & div.dataTables_wrapper div.dataTables_filter label {
+            display: block;
+            width: 100%;
+        }
+    }
+}

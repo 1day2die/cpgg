@@ -1,0 +1,263 @@
+/*
+ * Buttons. Each Bootstrap variant only sets --aurora-btn-* values;
+ * the shared rules below turn them into states. Geometry stays Bootstrap's.
+ */
+
+:root {
+    & .btn {
+        --aurora-btn-bg: transparent;
+        --aurora-btn-fg: var(--aurora-text);
+        --aurora-btn-border: transparent;
+        --aurora-btn-ring: var(--aurora-ring);
+        font-size: var(--aurora-text-base);
+        font-weight: 500;
+        line-height: 1.6;
+        border-radius: var(--aurora-radius-field);
+        transition: var(--aurora-transition);
+    }
+
+    & .btn-sm {
+        font-size: var(--aurora-text-sm);
+        line-height: 1.6154;
+        border-radius: var(--aurora-radius-sm);
+    }
+
+    & .btn-lg {
+        border-radius: var(--aurora-radius-box);
+    }
+
+    & .btn-primary {
+        --aurora-btn-bg: var(--color-primary);
+        --aurora-btn-fg: var(--color-primary-content);
+        --aurora-btn-soft: var(--aurora-primary-soft);
+        --aurora-btn-soft-fg: var(--aurora-primary-fg);
+    }
+
+    & .btn-info {
+        --aurora-btn-bg: var(--color-info);
+        --aurora-btn-fg: var(--color-info-content);
+        --aurora-btn-soft: var(--aurora-info-soft);
+        --aurora-btn-soft-fg: var(--aurora-info-fg);
+    }
+
+    & .btn-success {
+        --aurora-btn-bg: var(--color-success);
+        --aurora-btn-fg: var(--color-success-content);
+        --aurora-btn-soft: var(--aurora-success-soft);
+        --aurora-btn-soft-fg: var(--aurora-success-fg);
+    }
+
+    & .btn-warning {
+        --aurora-btn-bg: var(--color-warning);
+        --aurora-btn-fg: var(--color-warning-content);
+        --aurora-btn-soft: var(--aurora-warning-soft);
+        --aurora-btn-soft-fg: var(--aurora-warning-fg);
+    }
+
+    & .btn-danger {
+        --aurora-btn-bg: var(--color-error);
+        --aurora-btn-fg: var(--color-error-content);
+        --aurora-btn-soft: var(--aurora-error-soft);
+        --aurora-btn-soft-fg: var(--aurora-error-fg);
+    }
+
+    & .btn-dark {
+        --aurora-btn-bg: var(--color-neutral);
+        --aurora-btn-fg: var(--color-neutral-content);
+        --aurora-btn-soft: var(--aurora-neutral-soft);
+        --aurora-btn-soft-fg: var(--aurora-text);
+    }
+
+    & .btn-secondary {
+        --aurora-btn-soft: var(--aurora-neutral-soft);
+        --aurora-btn-soft-fg: var(--aurora-text);
+    }
+
+    /* Solid variants */
+    & :is(.btn-primary, .btn-info, .btn-success, .btn-warning, .btn-danger, .btn-dark) {
+        color: var(--aurora-btn-fg);
+        background-color: var(--aurora-btn-bg);
+        border-color: var(--aurora-btn-bg);
+        box-shadow: var(--aurora-shadow-xs), inset 0 1px 0 oklch(100% 0 0 / 0.1);
+        --aurora-btn-ring: 0 0 0 3px color-mix(in oklab, var(--aurora-btn-bg) 38%, transparent);
+    }
+
+    & :is(.btn-primary, .btn-info, .btn-success, .btn-warning, .btn-danger, .btn-dark):is(:hover, :focus, .focus) {
+        color: var(--aurora-btn-fg);
+        background-color: color-mix(in oklab, var(--aurora-btn-bg) 88%, black);
+        border-color: color-mix(in oklab, var(--aurora-btn-bg) 88%, black);
+    }
+
+    & :is(.btn-primary, .btn-info, .btn-success, .btn-warning, .btn-danger, .btn-dark):not(:disabled):not(.disabled):is(:active, .active),
+    & .show > :is(.btn-primary, .btn-info, .btn-success, .btn-warning, .btn-danger, .btn-dark).dropdown-toggle {
+        color: var(--aurora-btn-fg);
+        background-color: color-mix(in oklab, var(--aurora-btn-bg) 78%, black);
+        border-color: color-mix(in oklab, var(--aurora-btn-bg) 78%, black);
+        box-shadow: inset 0 1px 2px oklch(0% 0 0 / 0.2);
+    }
+
+    /* Neutral variants */
+    & .btn-secondary {
+        color: var(--aurora-text);
+        background-color: var(--aurora-neutral-soft);
+        border-color: transparent;
+        box-shadow: none;
+    }
+
+    & .btn-secondary:is(:hover, :focus, .focus) {
+        color: var(--aurora-text);
+        background-color: color-mix(in oklab, var(--color-base-content) 14%, transparent);
+        border-color: transparent;
+    }
+
+    & .btn-secondary:not(:disabled):not(.disabled):is(:active, .active),
+    & .show > .btn-secondary.dropdown-toggle {
+        color: var(--aurora-text);
+        background-color: color-mix(in oklab, var(--color-base-content) 18%, transparent);
+        border-color: transparent;
+    }
+
+    & :is(.btn-default, .btn-light) {
+        color: var(--aurora-text);
+        background-color: var(--aurora-surface);
+        border-color: var(--aurora-border);
+        box-shadow: var(--aurora-shadow-xs);
+    }
+
+    & :is(.btn-default, .btn-light):is(:hover, :focus, .focus, .hover) {
+        color: var(--aurora-text);
+        background-color: color-mix(in oklab, var(--color-base-content) 5%, var(--aurora-surface));
+        border-color: var(--aurora-field-border);
+    }
+
+    & :is(.btn-default, .btn-light):not(:disabled):not(.disabled):is(:active, .active),
+    & .show > :is(.btn-default, .btn-light).dropdown-toggle {
+        color: var(--aurora-text);
+        background-color: color-mix(in oklab, var(--color-base-content) 9%, var(--aurora-surface));
+        border-color: var(--aurora-field-border);
+    }
+
+    /* Outline variants: soft fill on interaction */
+    & .btn-outline-primary {
+        --aurora-btn-line: var(--color-primary);
+        --aurora-btn-soft: var(--aurora-primary-soft);
+        --aurora-btn-soft-fg: var(--aurora-primary-fg);
+    }
+
+    & .btn-outline-info {
+        --aurora-btn-line: var(--color-info);
+        --aurora-btn-soft: var(--aurora-info-soft);
+        --aurora-btn-soft-fg: var(--aurora-info-fg);
+    }
+
+    & .btn-outline-success {
+        --aurora-btn-line: var(--color-success);
+        --aurora-btn-soft: var(--aurora-success-soft);
+        --aurora-btn-soft-fg: var(--aurora-success-fg);
+    }
+
+    & .btn-outline-warning {
+        --aurora-btn-line: var(--color-warning);
+        --aurora-btn-soft: var(--aurora-warning-soft);
+        --aurora-btn-soft-fg: var(--aurora-warning-fg);
+    }
+
+    & .btn-outline-danger {
+        --aurora-btn-line: var(--color-error);
+        --aurora-btn-soft: var(--aurora-error-soft);
+        --aurora-btn-soft-fg: var(--aurora-error-fg);
+    }
+
+    & :is(.btn-outline-secondary, .btn-outline-dark, .btn-outline-light) {
+        --aurora-btn-line: var(--aurora-field-border);
+        --aurora-btn-soft: var(--aurora-hover);
+        --aurora-btn-soft-fg: var(--aurora-text);
+    }
+
+    & [class*="btn-outline-"] {
+        color: var(--aurora-btn-soft-fg);
+        background-color: transparent;
+        border-color: color-mix(in oklab, var(--aurora-btn-line) 70%, transparent);
+        --aurora-btn-ring: 0 0 0 3px color-mix(in oklab, var(--aurora-btn-line) 35%, transparent);
+    }
+
+    & [class*="btn-outline-"]:is(:hover, :focus, .focus),
+    & [class*="btn-outline-"]:not(:disabled):not(.disabled):is(:active, .active),
+    & .show > [class*="btn-outline-"].dropdown-toggle {
+        color: var(--aurora-btn-soft-fg);
+        background-color: var(--aurora-btn-soft);
+        border-color: var(--aurora-btn-line);
+        box-shadow: none;
+    }
+
+    & .btn-link {
+        color: var(--aurora-link);
+        font-weight: 500;
+    }
+
+    & .btn-link:hover {
+        color: var(--aurora-link-hover);
+        text-decoration: underline;
+    }
+
+    & .btn-tool {
+        color: var(--aurora-text-subtle);
+        border-radius: var(--aurora-radius-sm);
+    }
+
+    & .btn-tool:hover {
+        color: var(--aurora-text);
+        background-color: var(--aurora-hover);
+    }
+
+    /* Focus and disabled states for every variant */
+    & .btn:focus:not(:focus-visible) {
+        outline: 0;
+    }
+
+    & .btn.btn:focus-visible,
+    & .btn.btn.focus {
+        outline: 0;
+        box-shadow: var(--aurora-btn-ring);
+    }
+
+    & .btn:disabled,
+    & .btn.disabled,
+    & .btn[disabled] {
+        opacity: 0.5;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+
+    /* Calmer, soft action buttons inside data tables */
+    & .table .btn-sm:is(.btn-primary, .btn-info, .btn-success, .btn-warning, .btn-danger, .btn-dark, .btn-secondary) {
+        color: var(--aurora-btn-soft-fg) !important;
+        background-color: var(--aurora-btn-soft);
+        border-color: transparent;
+        box-shadow: none;
+    }
+
+    & .table .btn-sm:is(.btn-primary, .btn-info, .btn-success, .btn-warning, .btn-danger, .btn-dark):is(:hover, :focus-visible) {
+        color: var(--aurora-btn-fg) !important;
+        background-color: var(--aurora-btn-bg);
+        border-color: var(--aurora-btn-bg);
+    }
+
+    & .table .btn-sm.btn-secondary:is(:hover, :focus-visible) {
+        background-color: color-mix(in oklab, var(--color-base-content) 16%, transparent);
+    }
+
+    /* Close buttons (modals, alerts) */
+    & .close {
+        color: var(--aurora-text-muted);
+        text-shadow: none;
+        opacity: 1;
+        font-weight: 400;
+        transition: var(--aurora-transition);
+    }
+
+    & .close:not(:disabled):not(.disabled):is(:hover, :focus) {
+        color: var(--aurora-text);
+        opacity: 1;
+    }
+}

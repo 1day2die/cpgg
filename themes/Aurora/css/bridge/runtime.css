@@ -1,0 +1,193 @@
+/*
+ * Unlayered overrides for CSS that is not part of the bundle:
+ * SweetAlert2 injects its styles at runtime, Summernote is loaded via <link>.
+ */
+
+/* SweetAlert2 dialogs and toasts */
+:root body:not(.swal2-toast-shown) .swal2-container:is(.swal2-backdrop-show, .swal2-noanimation) {
+    background: var(--aurora-backdrop);
+}
+
+:root .swal2-popup {
+    color: var(--aurora-text);
+    background: var(--aurora-overlay-surface) !important;
+    border: 1px solid var(--aurora-border);
+    border-radius: var(--aurora-radius-lg);
+    box-shadow: var(--aurora-shadow-xl);
+    font-family: var(--aurora-font-sans);
+}
+
+/* Swal clips its toast container (partly via inline style), which would cut off the toast shadow */
+:root body.swal2-toast-shown .swal2-container {
+    overflow: visible !important;
+}
+
+:root .swal2-popup.swal2-toast {
+    border-radius: var(--aurora-radius-box);
+    box-shadow: var(--aurora-shadow-lg);
+    padding: 0.75rem 1rem;
+}
+
+:root .swal2-popup .swal2-title {
+    color: var(--aurora-text);
+    font-size: 1.375em;
+    font-weight: 600;
+    letter-spacing: var(--aurora-tracking-tight);
+}
+
+:root .swal2-popup.swal2-toast .swal2-title {
+    font-size: var(--aurora-text-base);
+    font-weight: 500;
+}
+
+:root .swal2-popup :is(.swal2-content, .swal2-html-container) {
+    color: var(--aurora-text-muted);
+    font-size: 1em;
+    line-height: var(--aurora-leading);
+}
+
+:root .swal2-popup .swal2-styled {
+    border-radius: var(--aurora-radius-field);
+    font-size: var(--aurora-text-base);
+    font-weight: 500;
+    padding: 0.5625em 1.25em;
+    transition: var(--aurora-transition);
+}
+
+:root .swal2-popup .swal2-styled.swal2-confirm {
+    color: var(--color-primary-content);
+    background-color: var(--color-primary);
+}
+
+:root .swal2-popup .swal2-styled.swal2-cancel {
+    color: var(--aurora-text);
+    background-color: var(--aurora-neutral-soft);
+}
+
+:root .swal2-popup .swal2-styled.swal2-deny {
+    color: var(--color-error-content);
+    background-color: var(--color-error);
+}
+
+:root .swal2-popup .swal2-styled:hover {
+    background-image: linear-gradient(oklch(0% 0 0 / 0.08), oklch(0% 0 0 / 0.08));
+}
+
+:root .swal2-popup .swal2-styled:focus {
+    box-shadow: var(--aurora-ring);
+}
+
+:root .swal2-popup .swal2-close {
+    color: var(--aurora-text-subtle);
+}
+
+:root .swal2-popup .swal2-close:hover {
+    color: var(--aurora-text);
+}
+
+:root .swal2-popup :is(.swal2-input, .swal2-textarea, .swal2-select, .swal2-file) {
+    color: var(--aurora-text);
+    background: var(--aurora-field-bg);
+    border: 1px solid var(--aurora-field-border);
+    border-radius: var(--aurora-radius-field);
+    box-shadow: none;
+}
+
+:root .swal2-popup :is(.swal2-input, .swal2-textarea, .swal2-select, .swal2-file):focus {
+    border-color: var(--color-primary);
+    box-shadow: var(--aurora-ring);
+}
+
+:root .swal2-popup .swal2-validation-message {
+    color: var(--aurora-error-fg);
+    background: var(--aurora-error-soft);
+}
+
+:root .swal2-popup .swal2-timer-progress-bar {
+    background: color-mix(in oklab, var(--color-primary) 55%, transparent);
+}
+
+:root .swal2-icon.swal2-success {
+    border-color: color-mix(in oklab, var(--color-success) 35%, transparent);
+    color: var(--color-success);
+}
+
+:root .swal2-icon.swal2-success .swal2-success-ring {
+    border-color: color-mix(in oklab, var(--color-success) 35%, transparent);
+}
+
+:root .swal2-icon.swal2-success [class^="swal2-success-line"] {
+    background-color: var(--color-success);
+}
+
+:root .swal2-icon.swal2-error {
+    border-color: var(--color-error);
+    color: var(--color-error);
+}
+
+:root .swal2-icon.swal2-error [class^="swal2-x-mark-line"] {
+    background-color: var(--color-error);
+}
+
+:root .swal2-icon.swal2-warning {
+    border-color: var(--color-warning);
+    color: var(--aurora-warning-fg);
+}
+
+:root .swal2-icon.swal2-info {
+    border-color: var(--color-info);
+    color: var(--aurora-info-fg);
+}
+
+:root .swal2-icon.swal2-question {
+    border-color: var(--aurora-field-border);
+    color: var(--aurora-text-muted);
+}
+
+/* Summernote */
+:root .note-editor.note-frame {
+    background-color: var(--aurora-field-bg);
+    border: 1px solid var(--aurora-field-border);
+    border-radius: var(--aurora-radius-field);
+    overflow: hidden;
+}
+
+:root .note-editor.note-frame:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: var(--aurora-ring);
+}
+
+:root .note-editor .note-toolbar {
+    background-color: var(--aurora-surface-muted);
+    border-bottom: 1px solid var(--aurora-border);
+}
+
+:root .note-editor.note-frame .note-editing-area .note-editable {
+    color: var(--aurora-text);
+    background-color: var(--aurora-field-bg);
+}
+
+:root .note-editor.note-frame .note-statusbar {
+    background-color: var(--aurora-surface-muted);
+    border-top: 1px solid var(--aurora-border);
+}
+
+:root .note-editor.note-frame .note-statusbar .note-resizebar .note-icon-bar {
+    border-top-color: var(--aurora-field-border);
+}
+
+:root .note-placeholder {
+    color: var(--aurora-text-subtle);
+}
+
+:root .note-editor .note-toolbar .note-btn {
+    color: var(--aurora-text);
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+:root .note-editor .note-toolbar .note-btn:hover,
+:root .note-editor .note-toolbar .note-btn.active {
+    background-color: var(--aurora-hover);
+}
